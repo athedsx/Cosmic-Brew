@@ -1,7 +1,7 @@
 using UnityEngine;
 
-// Sprites simples gerados em tempo de execução (cantos arredondados, círculo, estrela),
-// para a UI não depender de arquivos de imagem.
+// Simple sprites generated at runtime (rounded rect, circle, star),
+// so the UI does not depend on image files.
 public static class UISprites
 {
     static Sprite rounded, circle, star;
@@ -13,7 +13,7 @@ public static class UISprites
 
     static Sprite soft;
 
-    // círculo com borda bem suave (vapor, nuvenzinhas)
+    // circle with a very soft edge (steam, little clouds)
     static Sprite MakeSoft(int size)
     {
         var tex = NewTexture(size);
@@ -54,7 +54,7 @@ public static class UISprites
 
     static Sprite MakeStar(int size)
     {
-        // estrela de 5 pontas com pontas levemente "gordinhas"
+        // 5-pointed star with slightly chubby tips
         var pts = new Vector2[10];
         float cx = size / 2f, cy = size / 2f, outer = size * 0.48f, inner = size * 0.23f;
         for (int i = 0; i < 10; i++)
@@ -65,7 +65,7 @@ public static class UISprites
         }
         var tex = NewTexture(size);
         var px = new Color32[size * size];
-        const int ss = 4; // supersampling para borda suave
+        const int ss = 4; // supersampling for a smooth edge
         for (int y = 0; y < size; y++)
             for (int x = 0; x < size; x++)
             {

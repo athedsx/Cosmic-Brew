@@ -1,7 +1,7 @@
 using UnityEngine;
 
-// Cliente: chega, espera no banquinho com o pedido num balão, bebe ("Ahhh…"), paga e vai embora.
-// Nunca vai embora irritado: se o pedido vier errado, só balança a cabeça e continua esperando.
+// Customer: arrives, waits at a stool with the order in a bubble, drinks ("Ahhh…"), pays and leaves.
+// Never leaves upset: a wrong order just gets a head shake and they keep waiting.
 public class Customer : Interactable
 {
     public enum State { Arriving, Waiting, Drinking, Leaving }
@@ -10,7 +10,7 @@ public class Customer : Interactable
     public float drinkTime = 3.4f;
     public float bubbleHeight = 1.55f;
 
-    [System.NonSerialized] public ShipArrival ship; // nave que trouxe o cliente (vai embora com ele)
+    [System.NonSerialized] public ShipArrival ship; // ship that brought the customer (leaves with them)
 
     public State CurrentState { get; private set; }
     public Recipe Order { get; private set; }
@@ -21,7 +21,7 @@ public class Customer : Interactable
     private float stateTime, refuseTime = -10f, scale;
     private GameUI.Bubble bubble;
 
-    // bebendo: xícara na mão, gole, "Ahhh…" e só então a gorjeta
+    // drinking: cup in hand, a sip, "Ahhh…" and only then the tip
     private Transform cup;
     private Vector3 cupStartLocal;
     private bool ahhDone;
@@ -52,7 +52,7 @@ public class Customer : Interactable
         float dt = Time.deltaTime;
         stateTime += dt;
 
-        // aparece/desaparece com um "pop" suave
+        // appears/disappears with a soft "pop"
         float targetScale = CurrentState == State.Leaving && Arrived(exitPos) ? 0f : 1f;
         scale = Mathf.MoveTowards(scale, targetScale, dt * 2.5f);
         transform.localScale = Vector3.one * Mathf.Max(0.01f, Mathf.SmoothStep(0f, 1f, scale));
@@ -64,7 +64,7 @@ public class Customer : Interactable
                 break;
 
             case State.Waiting:
-                // se recusou algo, balança a cabeça ("não é esse~") sem sair do lugar
+                // after refusing a drink, shakes the head ("not this one~") without moving
                 float shake = Time.time - refuseTime < 0.9f ? Mathf.Sin((Time.time - refuseTime) * 22f) * 18f : 0f;
                 Face(lookTarget, dt, shake);
                 break;
@@ -103,7 +103,7 @@ public class Customer : Interactable
                 bubble?.Set("…", null);
                 break;
             case State.Leaving:
-                if (!ahhDone) Ahhh(); // garantia: nunca fica sem pagar
+                if (!ahhDone) Ahhh(); // safety net: always pays
                 if (cup != null) Destroy(cup.gameObject);
                 cup = null;
                 bubble?.Close();
@@ -145,7 +145,7 @@ public class Customer : Interactable
         transform.rotation = Quaternion.Slerp(transform.rotation, look, 1f - Mathf.Exp(-10f * dt));
     }
 
-    // ---------- Interactable: servir ----------
+    // ---------- Interactable: serving ----------
     public override Vector3 PromptPosition => transform.position + Vector3.up * promptHeight;
 
     public override string GetPrompt(PlayerCarry player, out bool enabled)
@@ -160,7 +160,7 @@ public class Customer : Interactable
         var ui = GameUI.Instance;
         if (Order.Matches(player.Contents))
         {
-            // a xícara passa da mão do Ro para a do cliente
+            // the cup moves from Ro's hands to the customer's
             BuildCup(player.MugWorldPosition, player.LiquidColor, player.LiquidGlows);
             player.Clear();
             pendingTip = Random.Range(1, 5);
@@ -175,7 +175,7 @@ public class Customer : Interactable
         }
     }
 
-    // ---------- bebendo ----------
+    // ---------- drinking ----------
     public override Vector3 HandoffPoint => transform.TransformPoint(HandLocal);
 
     static float Ease(float x) => Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(x));
@@ -203,14 +203,14 @@ public class Customer : Interactable
         Part(PrimitiveType.Cube, new Vector3(0.15f, 0.01f, 0f), new Vector3(0.05f, 0.13f, 0.04f), ceramic);
         cup.position = worldPos;
         cupStartLocal = cup.localPosition;
-        // o cliente é escalado ao aparecer; a xícara mantém o tamanho do mundo
+        // the customer scales in on arrival; the cup keeps its world size
         cup.localScale = Vector3.one / Mathf.Max(0.01f, transform.localScale.x);
     }
 
     void AnimateDrink(float u, float dt)
     {
         if (cup == null) return;
-        // 0–.12 pega · .12–.25 leva à boca · .25–.5 gole · .5 "Ahhh" · .55–.75 abaixa · .8–1 some
+        // 0–.12 grab · .12–.25 raise · .25–.5 sip · .5 "Ahhh" · .55–.75 lower · .8–1 vanish
         Vector3 pos;
         Quaternion rot = Quaternion.identity;
         if (u < 0.12f) pos = Vector3.Lerp(cupStartLocal, HandLocal, Ease(u / 0.12f));
@@ -227,7 +227,7 @@ public class Customer : Interactable
         float shrink = 1f - Ease((u - 0.8f) / 0.2f);
         cup.localScale = Vector3.one * shrink / Mathf.Max(0.01f, transform.localScale.x);
 
-        // vapor saindo da xícara no começo
+        // steam rising from the cup at first
         if (u < 0.45f)
         {
             steamAccum += dt * 8f;
@@ -241,7 +241,7 @@ public class Customer : Interactable
         if (!ahhDone && u >= 0.5f) Ahhh();
     }
 
-    // "Ahhh…": pulinho feliz, brilhos e a gorjeta
+    // "Ahhh…": happy hop, sparkles and the tip
     void Ahhh()
     {
         ahhDone = true;
@@ -261,7 +261,7 @@ public class Customer : Interactable
         }
     }
 
-    // idioma mudou: reescreve o balão
+    // language changed: rewrite the bubble
     void RefreshBubble()
     {
         if (bubble == null || Order == null) return;

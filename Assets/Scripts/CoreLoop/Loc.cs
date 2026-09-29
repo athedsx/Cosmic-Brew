@@ -3,8 +3,8 @@ using UnityEngine;
 
 public enum Lang { PT, EN, RU, KO, ZH, JA }
 
-// Traduções do jogo. Textos em Resources/Localization/strings.txt (TSV: key, pt, en, ru, ko, zh, ja).
-// Uso: Loc.Get("menu.play") ou Loc.Get("customer.serve", nomeDaBebida). Loc.Changed avisa quando o idioma muda.
+// Game localization. Texts live in Resources/Localization/strings.txt (TSV: key, pt, en, ru, ko, zh, ja).
+// Usage: Loc.Get("menu.play") or Loc.Get("customer.serve", drinkName). Loc.Changed fires when the language changes.
 public static class Loc
 {
     public const string PrefKey = "cosmicbrew.lang";
@@ -22,7 +22,7 @@ public static class Loc
     public static Lang Current { get { Ensure(); return current; } }
     public static Font Font => FontFor(Current);
 
-    // coreano, chinês e japonês: fontes já encorpadas, sem negrito artificial
+    // Korean, Chinese and Japanese: fonts are already heavy, no synthetic bold
     public static bool IsCJK => Current == Lang.KO || Current == Lang.ZH || Current == Lang.JA;
 
     public static Font FontFor(Lang lang)
@@ -37,7 +37,7 @@ public static class Loc
     {
         Ensure();
         if (string.IsNullOrEmpty(key)) return "";
-        if (!table.TryGetValue(key, out var row)) return key; // chave faltando aparece na tela (fácil de achar)
+        if (!table.TryGetValue(key, out var row)) return key; // missing keys show on screen (easy to spot)
         string s = row[(int)current];
         if (string.IsNullOrEmpty(s)) s = row[(int)Lang.EN];
         if (string.IsNullOrEmpty(s)) s = row[(int)Lang.PT];
@@ -51,7 +51,7 @@ public static class Loc
         catch (System.FormatException) { return s; }
     }
 
-    // Traduz se for uma chave conhecida; senão devolve o próprio texto
+    // Translates known keys; otherwise returns the text itself
     public static string KeyOr(string key, string fallback)
     {
         Ensure();
@@ -86,14 +86,14 @@ public static class Loc
                 table[parts[0]] = row;
             }
         }
-        else Debug.LogWarning("[Loc] Resources/Localization/strings.txt não encontrado");
+        else Debug.LogWarning("[Loc] Resources/Localization/strings.txt not found");
 
         string saved = PlayerPrefs.GetString(PrefKey, "");
         int idx = System.Array.IndexOf(Codes, saved);
         current = idx >= 0 ? (Lang)idx : Detect();
     }
 
-    // Primeira vez: usa o idioma do sistema
+    // First run: use the system language
     static Lang Detect()
     {
         switch (Application.systemLanguage)

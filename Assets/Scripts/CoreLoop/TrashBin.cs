@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Pedidos Zen: errou? joga fora e começa de novo, sem punição
+// Zen orders: wrong drink? dump it and start over, no penalty
 public class TrashBin : Interactable
 {
     private Transform lid, knob;
@@ -15,7 +15,7 @@ public class TrashBin : Interactable
         if (knob != null) knobBase = knob.localPosition;
     }
 
-    // a tampa abre (pula) enquanto o Ro despeja
+    // the lid pops open while Ro pours
     public override void OnWorkProgress(PlayerCarry player, float p)
     {
         float open = Mathf.Sin(Mathf.Clamp01((p - 0.2f) / 0.7f) * Mathf.PI);

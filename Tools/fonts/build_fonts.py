@@ -1,11 +1,11 @@
 """
-Corta (subset) as fontes do jogo para conter só os caracteres usados nas traduções.
+Subsets the game fonts so they only contain the characters used by the translations.
 
   python Tools/fonts/build_fonts.py
 
-Entrada: Tools/fonts/src/*.ttf (Google Fonts, licença SIL OFL) + Assets/Resources/Localization/strings.txt
-Saída:   Assets/Resources/Fonts/*.ttf (poucos KB/MB cada)
-Rode de novo sempre que adicionar ou mudar textos em strings.txt.
+Input:  Tools/fonts/src/*.ttf (Google Fonts, SIL OFL) + Assets/Resources/Localization/strings.txt
+Output: Assets/Resources/Fonts/*.ttf (a few KB to MB each)
+Run it again whenever you add or change text in strings.txt.
 """
 import io, os, shutil
 from fontTools.ttLib import TTFont
@@ -20,7 +20,7 @@ STRINGS = os.path.join(ROOT, "Assets", "Resources", "Localization", "strings.txt
 LANGS = ["pt", "en", "ru", "ko", "zh", "ja"]
 NATIVE = {"pt": "Português", "en": "English", "ru": "Русский", "ko": "한국어", "zh": "中文（简体）", "ja": "日本語"}
 
-# caracteres sempre incluídos: ASCII, Latin-1, pontuação tipográfica, símbolos usados na UI
+# characters always included: ASCII, Latin-1, typographic punctuation, UI symbols
 BASE = "".join(chr(c) for c in range(0x20, 0x7F)) + "".join(chr(c) for c in range(0xA0, 0x100)) \
        + "–—‘’“”•…·★☆♪♫«»№←→↑↓✓×（）：，。！？～〜、「」・％＋－"
 
@@ -60,18 +60,18 @@ def build(src_name, out_name, weight, chars):
     font.save(dst)
     cmap = font.getBestCmap()
     missing = sorted({c for c in chars if ord(c) not in cmap and c.strip()})
-    print(f"  {out_name:28s} {os.path.getsize(dst) / 1024:7.1f} KB  glifos={len(cmap):5d}  sem glifo: {''.join(missing)[:60]}")
+    print(f"  {out_name:28s} {os.path.getsize(dst) / 1024:7.1f} KB  glyphs={len(cmap):5d}  missing: {''.join(missing)[:60]}")
 
 
 def main():
     cols = read_columns()
     names = "".join(NATIVE.values())
     latin = BASE + "".join(cols["pt"] | cols["en"] | cols["ru"]) + "".join(chr(c) for c in range(0x400, 0x460))
-    print("Fontes:")
+    print("Fonts:")
     build("Nunito[wght].ttf", "Nunito-SemiBold.ttf", 650, latin + names)
     build("NotoSansKR[wght].ttf", "NotoSansKR-Medium.ttf", 550, BASE + "".join(cols["ko"]) + NATIVE["ko"])
     build("NotoSansSC[wght].ttf", "NotoSansSC-Medium.ttf", 550, BASE + "".join(cols["zh"]) + NATIVE["zh"])
-    # o japonês também serve de reserva para símbolos (♪) que a Nunito não tem
+    # the Japanese font also serves as a fallback for symbols (♪) that Nunito lacks
     build("NotoSansJP[wght].ttf", "NotoSansJP-Medium.ttf", 550, BASE + "".join(cols["ja"]) + NATIVE["ja"])
     lic = os.path.join(OUT, "LICENSE-OFL.txt")
     shutil.copy(os.path.join(SRC, "OFL.txt"), lic)

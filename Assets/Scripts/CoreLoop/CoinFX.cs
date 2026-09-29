@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Moedas Estelares 3D saltando do cliente quando ele paga (efeito visual)
+// 3D Star Coins popping out of a customer when they pay (visual effect)
 public class CoinFX : MonoBehaviour
 {
     public static CoinFX Instance { get; private set; }
 
-    [Tooltip("Moeda modelo (fica desativada; é clonada)")]
+    [Tooltip("Coin template (kept disabled; cloned)")]
     public GameObject coinTemplate;
     public float coinSize = 0.32f;
     public float lifetime = 1.5f;
@@ -23,7 +23,7 @@ public class CoinFX : MonoBehaviour
 
     void OnDestroy() { if (Instance == this) Instance = null; }
 
-    // Solta 'count' moedas a partir de 'origin'
+    // Spawns 'count' coins from 'origin'
     public void Burst(Vector3 origin, int count)
     {
         if (coinTemplate == null) return;
@@ -54,12 +54,12 @@ public class CoinFX : MonoBehaviour
                 coins.RemoveAt(i);
                 continue;
             }
-            // arco com "gravidade" suave e depois sobe flutuando antes de sumir
+            // arc with soft "gravity", then floats up before vanishing
             c.vel += Vector3.down * 7f * dt;
             if (u > 0.55f) c.vel = Vector3.Lerp(c.vel, Vector3.up * 1.5f, dt * 6f);
             c.t.position += c.vel * dt;
             c.t.Rotate(0f, c.spin * dt, 0f, Space.World);
-            // aparece com "pop" e encolhe no final
+            // pops in and shrinks at the end
             float s = u < 0.15f ? Mathf.SmoothStep(0f, 1.15f, u / 0.15f) : u > 0.75f ? Mathf.SmoothStep(1f, 0f, (u - 0.75f) / 0.25f) : 1f;
             c.t.localScale = Vector3.one * coinSize * s;
         }

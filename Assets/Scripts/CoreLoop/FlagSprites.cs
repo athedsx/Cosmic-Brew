@@ -1,10 +1,10 @@
 using UnityEngine;
 
-// Bandeirinhas dos idiomas, desenhadas por código (cantos arredondados):
-// Brasil, EUA, Rússia, Coreia do Sul, China e Japão.
+// Language flags drawn in code (rounded corners):
+// Brazil, USA, Russia, South Korea, China and Japan.
 public static class FlagSprites
 {
-    const int W = 120, H = 80, SS = 3; // supersampling para bordas suaves
+    const int W = 120, H = 80, SS = 3; // supersampling for smooth edges
     static readonly Sprite[] cache = new Sprite[6];
 
     public static Sprite For(Lang lang)
@@ -14,7 +14,7 @@ public static class FlagSprites
         return cache[i];
     }
 
-    delegate Color Painter(float x, float y); // x, y em 0..1 (y para cima)
+    delegate Color Painter(float x, float y); // x, y in 0..1 (y up)
 
     static Sprite Make(Lang lang)
     {
@@ -41,7 +41,7 @@ public static class FlagSprites
                         acc += p(fx, fy);
                     }
                 acc /= SS * SS;
-                // cantos arredondados
+                // rounded corners
                 float cx = Mathf.Clamp(x + 0.5f, radius, W - radius), cy = Mathf.Clamp(y + 0.5f, radius, H - radius);
                 float a = Mathf.Clamp01(radius - Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), new Vector2(cx, cy)) + 0.5f);
                 acc.a = a;
@@ -57,13 +57,13 @@ public static class FlagSprites
 
     static bool InStar(float x, float y, float cx, float cy, float r, float rot)
     {
-        // estrela de 5 pontas (coordenadas corrigidas pela proporção da bandeira)
+        // 5-pointed star (coordinates corrected for the flag's aspect ratio)
         float dx = (x - cx) * Aspect, dy = y - cy;
         float ang = Mathf.Atan2(dy, dx) - rot;
         float dist = Mathf.Sqrt(dx * dx + dy * dy);
         float k = Mathf.Repeat(ang, Mathf.PI * 2f / 5f) - Mathf.PI / 5f; // -36°..36°
         float inner = r * 0.382f;
-        // raio da borda na direção k (interpolação entre ponta e vale)
+        // edge radius in direction k (interpolating between tip and notch)
         float t = Mathf.Abs(k) / (Mathf.PI / 5f);
         float edge = Mathf.Lerp(r, inner, Mathf.Pow(t, 0.9f));
         return dist < edge;
@@ -74,7 +74,7 @@ public static class FlagSprites
         float dx = (x - 0.5f) * Aspect, dy = y - 0.5f;
         if (Mathf.Sqrt(dx * dx + dy * dy) < 0.24f)
         {
-            // faixa branca levemente curvada no círculo azul
+            // slightly curved white band across the blue circle
             float band = dy - (-0.03f + 0.12f * dx * dx * -2f + dx * 0.1f);
             return Mathf.Abs(band) < 0.03f ? Color.white : Hex("#002776");
         }
@@ -86,7 +86,7 @@ public static class FlagSprites
     {
         if (x < 0.42f && y > 1f - 0.54f)
         {
-            // cantão azul com estrelinhas em grade
+            // blue canton with a grid of little stars
             float gx = x / 0.42f * 6f, gy = (y - 0.46f) / 0.54f * 5f;
             bool odd = ((int)gy) % 2 == 1;
             float fx = Mathf.Repeat(gx + (odd ? 0.5f : 0f), 1f) - 0.5f, fy = Mathf.Repeat(gy, 1f) - 0.5f;
@@ -106,8 +106,8 @@ public static class FlagSprites
         float d = Mathf.Sqrt(dx * dx + dy * dy);
         if (d < r)
         {
-            // taegeuk: metade vermelha em cima, azul embaixo, com as "gotas"
-            float ang = -0.6f; // leve inclinação
+            // taegeuk: red half on top, blue below, with the "drops"
+            float ang = -0.6f; // slight tilt
             float rx = dx * Mathf.Cos(ang) - dy * Mathf.Sin(ang), ry = dx * Mathf.Sin(ang) + dy * Mathf.Cos(ang);
             bool top = ry > 0f;
             float lx = rx + r / 2f, rxx = rx - r / 2f;
@@ -115,7 +115,7 @@ public static class FlagSprites
             if (Mathf.Sqrt(rxx * rxx + ry * ry) < r / 2f) top = false;
             return top ? Hex("#CD2E3A") : Hex("#0047A0");
         }
-        // trigramas (simplificados) nos 4 cantos, na diagonal
+        // simplified trigrams in the 4 corners, on the diagonal
         Vector2[] centers = { new Vector2(0.2f, 0.78f), new Vector2(0.8f, 0.22f), new Vector2(0.8f, 0.78f), new Vector2(0.2f, 0.22f) };
         foreach (var c in centers)
         {

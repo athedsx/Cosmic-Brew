@@ -1,13 +1,13 @@
 """
-Gerador de áudio do Cosmic Brew (tudo sintetizado, sem samples externos).
+Cosmic Brew audio generator (everything is synthesized, no external samples).
 
   python Tools/audio_gen/generate_audio.py
 
-Gera em Assets/Audio/:
-  Music/  3 faixas lo-fi em loop perfeito (Rhodes FM, baixo, bateria boom-bap com swing,
-          chiado de vinil, oscilação de fita, filtro passa-baixa)
-  SFX/    efeitos "ASMR" do jogo (máquina de café, moedor, xícara, moedas, "Ahhh…", etc.)
-Só depende de numpy. Os resultados são determinísticos (sementes fixas).
+Writes to Assets/Audio/:
+  Music/  3 seamlessly looping lo-fi tracks (FM Rhodes, bass, swung boom-bap drums,
+          vinyl crackle, tape wow, low-pass filtering)
+  SFX/    the game's "ASMR" sound effects (coffee machine, grinder, cup, coins, "Ahhh…", etc.)
+Depends only on numpy. Output is deterministic (fixed seeds).
 """
 import os
 import wave
@@ -16,17 +16,17 @@ import numpy as np
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 OUT_MUSIC = os.path.join(ROOT, "Assets", "Audio", "Music")
 OUT_SFX = os.path.join(ROOT, "Assets", "Audio", "SFX")
-SR_MUSIC = 24000   # lo-fi de propósito (e arquivos menores)
+SR_MUSIC = 24000   # lo-fi on purpose (and smaller files)
 SR_SFX = 32000
 
 
-# ------------------------------------------------------------------ utilidades
+# ------------------------------------------------------------------ utilities
 def midi(n):
     return 440.0 * 2.0 ** ((n - 69) / 12.0)
 
 
 def write_wav(path, data, sr):
-    """data: (n,) mono ou (n, 2) estéreo, float -1..1"""
+    """data: (n,) mono or (n, 2) stereo, float -1..1"""
     os.makedirs(os.path.dirname(path), exist_ok=True)
     data = np.clip(data, -1.0, 1.0)
     ch = 1 if data.ndim == 1 else data.shape[1]
@@ -40,7 +40,7 @@ def write_wav(path, data, sr):
 
 
 def fft_filter(x, sr, gain_fn):
-    """Filtro por FFT (circular: perfeito para loops). gain_fn(freqs) -> ganho."""
+    """FFT filter (circular, so it is seamless for loops). gain_fn(freqs) -> gain."""
     spec = np.fft.rfft(x, axis=0)
     f = np.fft.rfftfreq(x.shape[0], 1.0 / sr)
     g = gain_fn(f)
@@ -62,7 +62,7 @@ def bandpass(lo, hi):
 
 
 def resonances(peaks):
-    """peaks: [(freq, largura, ganho)] -> soma de gaussianas no espectro (formantes)"""
+    """peaks: [(freq, width, gain)] -> sum of Gaussians in the spectrum (formants)"""
     def g(f):
         out = np.zeros_like(f)
         for fc, bw, gain in peaks:
@@ -94,16 +94,16 @@ def normalize(x, peak):
 
 
 def pan_stereo(mono, pan):
-    """pan -1..1 (lei de potência constante)"""
+    """pan -1..1 (constant-power law)"""
     a = (pan + 1) * np.pi / 4
     return np.stack([mono * np.cos(a), mono * np.sin(a)], axis=1)
 
 
-# ------------------------------------------------------------------ instrumentos
+# ------------------------------------------------------------------ instruments
 def rhodes(freq, dur, vel, sr, rng):
     n = int(dur * sr)
     t = np.arange(n) / sr
-    index = 1.6 * np.exp(-t * 3.5) + 0.25          # brilho do ataque que some
+    index = 1.6 * np.exp(-t * 3.5) + 0.25          # attack brightness that fades
     mod = np.sin(2 * np.pi * freq * t) * index
     car = np.sin(2 * np.pi * freq * t + mod)
     car += 0.18 * np.sin(2 * np.pi * freq * 2.0 * t) * np.exp(-t * 6)   # "tine"
@@ -159,7 +159,7 @@ def hat(sr, rng, vel=1.0, open_=False):
 
 
 def add_circular(buf, sig, start):
-    """soma sig em buf começando em start, dando a volta no fim (loop perfeito)"""
+    """adds sig into buf starting at start, wrapping around the end (seamless loop)"""
     n = len(buf)
     start %= n
     end = start + len(sig)
@@ -175,11 +175,11 @@ def add_circular(buf, sig, start):
             rest = rest[m:]
 
 
-# ------------------------------------------------------------------ música
+# ------------------------------------------------------------------ music
 TRACKS = [
     {
         "file": "lofi_01_cafe_na_nebulosa.wav", "title": "Café na Nebulosa", "bpm": 74, "seed": 11,
-        # (baixo, [notas do acorde]) — Gmaj9  F#m7(9)  Em9  A13
+        # (bass, [chord notes]) — Gmaj9  F#m7(9)  Em9  A13
         "chords": [(43, [59, 62, 66, 69]), (42, [57, 61, 64, 68]), (40, [55, 59, 62, 66]), (45, [55, 61, 66, 71])],
         "scale": [62, 64, 66, 69, 71, 74, 76, 78],
     },
@@ -191,7 +191,7 @@ TRACKS = [
     },
     {
         "file": "lofi_03_poeira_de_estrelas.wav", "title": "Poeira de Estrelas", "bpm": 80, "seed": 37,
-        # Fmaj9  Em7  Dm9  Cmaj9  (+ Bbmaj7 de vez em quando)
+        # Fmaj9  Em7  Dm9  Cmaj9  (+ Bbmaj7 now and then)
         "chords": [(41, [57, 60, 64, 67]), (40, [55, 59, 62, 67]), (38, [53, 57, 60, 64]), (36, [52, 55, 59, 62])],
         "alt": (34, [53, 57, 62, 65]),
         "scale": [60, 62, 65, 67, 69, 72, 74, 77],
@@ -203,7 +203,7 @@ BARS = 32
 def render_track(spec):
     sr = SR_MUSIC
     rng = np.random.default_rng(spec["seed"])
-    spb = 60.0 / spec["bpm"]                  # segundos por batida
+    spb = 60.0 / spec["bpm"]                  # seconds per beat
     bar = 4 * spb
     n = int(round(BARS * bar * sr))
     keys = np.zeros((n, 2))
@@ -212,10 +212,10 @@ def render_track(spec):
     lead = np.zeros((n, 2))
     duck = np.ones(n)
 
-    swing = 0.33 * (spb / 2)                  # atraso das colcheias "fracas"
+    swing = 0.33 * (spb / 2)                  # delay of the "weak" eighth notes
 
     def pos(bar_i, beat):
-        """posição em amostras de (compasso, batida em fração) com swing nas colcheias"""
+        """sample position of (bar, fractional beat) with swung eighth notes"""
         eighth = beat * 2
         sw = swing if (abs(eighth - round(eighth)) < 1e-6 and int(round(eighth)) % 2 == 1) else 0.0
         return int(round((bar_i * bar + beat * spb + sw) * sr))
@@ -228,7 +228,7 @@ def render_track(spec):
         intro = b < 4
         breakdown = 16 <= b < 20
 
-        # ---- Rhodes: acorde no 1 (dedilhado) e às vezes repique no "e" do 2
+        # ---- Rhodes: strummed chord on 1, sometimes a re-hit on the "and" of 2
         for k, note in enumerate(notes):
             v = 0.2 * rng.uniform(0.85, 1.0)
             s = rhodes(midi(note), bar * 1.02, v, sr, rng)
@@ -240,7 +240,7 @@ def render_track(spec):
                 add_circular(keys[:, 0], s, pos(b, 1.5) + int(k * 0.012 * sr))
                 add_circular(keys[:, 1], s, pos(b, 1.5) + int(k * 0.012 * sr))
 
-        # ---- baixo
+        # ---- bass
         if not intro:
             add_circular(low, bass(midi(bass_note), spb * 1.6, 0.42, sr), pos(b, 0))
             second = bass_note + (7 if rng.random() < 0.5 else 12)
@@ -248,7 +248,7 @@ def render_track(spec):
             if rng.random() < 0.4:
                 add_circular(low, bass(midi(bass_note), spb * 0.8, 0.28, sr), pos(b, 3.5))
 
-        # ---- bateria boom-bap
+        # ---- boom-bap drums
         if not intro:
             kicks = [0.0, 1.75, 2.5] if not breakdown else []
             if b % 4 == 3 and not breakdown:
@@ -258,7 +258,7 @@ def render_track(spec):
                 kk = kick(sr, 0.85 * rng.uniform(0.9, 1.0))
                 add_circular(drums[:, 0], kk, p)
                 add_circular(drums[:, 1], kk, p)
-                d = 1.0 - 0.35 * np.exp(-np.arange(int(0.3 * sr)) / sr * 9)   # sidechain suave
+                d = 1.0 - 0.35 * np.exp(-np.arange(int(0.3 * sr)) / sr * 9)   # gentle sidechain
                 seg = np.arange(len(d)) + p
                 duck[seg % n] = np.minimum(duck[seg % n], d)
             for sb in (1.0, 3.0):
@@ -275,7 +275,7 @@ def render_track(spec):
                 add_circular(drums[:, 0], h * 0.7, pos(b, e / 2))
                 add_circular(drums[:, 1], h, pos(b, e / 2))
 
-        # ---- melodia esparsa de sininhos
+        # ---- sparse bell melody
         if b >= 8 and not breakdown:
             for e in range(8):
                 if rng.random() < 0.16:
@@ -286,7 +286,7 @@ def render_track(spec):
     t = np.arange(n) / sr
     mix = keys * duck[:, None] * 0.9 + pan_stereo(low * duck, 0.0) * 0.8 + drums * 0.75 + lead
 
-    # ---- vinil: estalinhos + chiado
+    # ---- vinyl: crackles + hiss
     crackle = np.zeros(n)
     count = int(n / sr * 7)
     idx = rng.integers(0, n, count)
@@ -295,20 +295,20 @@ def render_track(spec):
     hiss = fft_filter(rng.standard_normal(n), sr, bandpass(2000, 8000)) * 0.004
     mix += pan_stereo(crackle + hiss, 0.0) * 0.9
 
-    # ---- oscilação de fita (wow): LFO com número inteiro de ciclos no loop
+    # ---- tape wow: LFO with a whole number of cycles per loop
     cycles = max(1, round(n / sr * 0.45))
     warp = np.arange(n) + np.sin(2 * np.pi * cycles * np.arange(n) / n) * 0.0022 * sr
     i0 = np.floor(warp).astype(int)
     frac = (warp - i0)[:, None]
     mix = mix[i0 % n] * (1 - frac) + mix[(i0 + 1) % n] * frac
 
-    # ---- cor lo-fi: passa-baixa, sem sub-grave, saturação leve
+    # ---- lo-fi color: low-pass, no sub-bass, light saturation
     mix = fft_filter(mix, sr, lambda f: lowpass(4200, 2)(f) * highpass(38, 2)(f))
     mix = np.tanh(mix * 1.6) / np.tanh(1.6)
     return normalize(mix, 0.62)
 
 
-# ------------------------------------------------------------------ efeitos
+# ------------------------------------------------------------------ sound effects
 def sfx_all():
     sr = SR_SFX
     rng = np.random.default_rng(7)
@@ -317,7 +317,7 @@ def sfx_all():
     def T(d):
         return np.arange(int(d * sr)) / sr
 
-    # máquina de café: bomba vibrando + vapor + gotas no final (≈1.4 s)
+    # coffee machine: humming pump + steam + drips at the end (≈1.4 s)
     t = T(1.5)
     pump = np.sign(np.sin(2 * np.pi * 50 * t)) * 0.25 + np.sin(2 * np.pi * 100 * t) * 0.2
     pump = fft_filter(pump, sr, lowpass(900)) * np.clip(t / 0.08, 0, 1) * np.clip((1.25 - t) / 0.1, 0, 1)
@@ -330,7 +330,7 @@ def sfx_all():
         drips[s:s + len(tt)] += np.sin(2 * np.pi * (900 + 1400 * np.exp(-tt * 60)) * tt) * np.exp(-tt * 70) * 0.35
     out["coffee_brew"] = fade(pump + steam + drips, sr)
 
-    # moedor: raspado granulado com pulsos da manivela (≈1.1 s)
+    # grinder: grainy scraping with crank pulses (≈1.1 s)
     t = T(1.15)
     grain = fft_filter(rng.standard_normal(len(t)), sr, bandpass(700, 5000))
     grain /= np.max(np.abs(grain))
@@ -341,13 +341,13 @@ def sfx_all():
                   for f, t0 in ((2637, 0.3), (3136, 0.55), (3520, 0.8)))
     out["grinder"] = fade((grain * crank * 0.45 + clicks) * np.clip(t / 0.05, 0, 1) + sparkle, sr)
 
-    # xícara tilintando
+    # clinking cup
     t = T(0.7)
     clink = sum(a * np.sin(2 * np.pi * f * t) * np.exp(-t * dec) for f, a, dec in
                 ((2350, 0.5, 9), (3170, 0.35, 12), (5120, 0.2, 18), (1180, 0.15, 7)))
     out["cup_clink"] = fade(clink * 0.8, sr, 0.001)
 
-    # moedas: arpejo de sininhos
+    # coins: bell arpeggio
     t = T(1.0)
     coin = np.zeros(len(t))
     for i, note in enumerate((88, 92, 95, 100)):
@@ -356,7 +356,7 @@ def sfx_all():
         coin[s:s + len(b)] += b[:len(coin) - s]
     out["coin"] = fade(coin, sr, 0.001)
 
-    # "Ahhh…" do cliente: voz sintetizada (pulso glotal + formantes da vogal "a")
+    # customer "Ahhh…": synthesized voice (glottal pulse + formants of the vowel "a")
     t = T(1.1)
     f0 = 300 * np.exp(-t * 0.35) + 10 * np.sin(2 * np.pi * 5.5 * t)
     ph = np.cumsum(f0) / sr
@@ -366,7 +366,7 @@ def sfx_all():
     voice = voice / np.max(np.abs(voice)) * np.clip(t / 0.07, 0, 1) * np.clip((1.1 - t) / 0.45, 0, 1)
     out["customer_ahh"] = fade(voice * 0.5, sr)
 
-    # pedido errado: "hm-hmm" fofinho descendo
+    # wrong order: a cute descending "hm-hmm"
     t = T(0.55)
     wrong = np.zeros(len(t))
     for s0, f, d in ((0.0, 520, 0.2), (0.24, 390, 0.28)):
@@ -376,7 +376,7 @@ def sfx_all():
         wrong[s:s + len(tt)] += tone * np.sin(np.pi * tt / d) * 0.35
     out["wrong"] = fade(wrong, sr)
 
-    # lixeira: sopro + batidinha
+    # bin: whoosh + small thump
     t = T(0.6)
     whoosh = fft_filter(rng.standard_normal(len(t)), sr, bandpass(400, 3000))
     whoosh = whoosh / np.max(np.abs(whoosh)) * np.sin(np.pi * np.clip(t / 0.35, 0, 1)) * 0.35
@@ -384,20 +384,20 @@ def sfx_all():
     thud[s:] = np.sin(2 * np.pi * (140 * np.exp(-tt * 10) + 60) * tt) * np.exp(-tt * 18) * 0.6
     out["trash"] = fade(whoosh + thud, sr)
 
-    # colocar decoração: "pop" + batida de madeira
+    # place decoration: "pop" + wood knock
     t = T(0.35)
     pop = np.sin(2 * np.pi * (300 + 900 * (1 - np.exp(-t * 40))) * t) * np.exp(-t * 22) * 0.45
     knock = fft_filter(rng.standard_normal(len(t)), sr, bandpass(600, 2500)) * np.exp(-t * 60)
     out["place"] = fade(pop + knock / np.max(np.abs(knock)) * 0.25, sr, 0.001)
 
-    # guardar decoração: pop invertido (sobe e some)
+    # store decoration: reversed pop (rises and fades)
     out["store"] = fade(out["place"][::-1] * np.linspace(0.3, 1, len(out["place"])), sr)
 
-    # clique de UI
+    # UI click
     t = T(0.08)
     out["ui_click"] = fade(np.sin(2 * np.pi * 1800 * t) * np.exp(-t * 80) * 0.35, sr, 0.001)
 
-    # abrir/fechar construção: sopro que sobe / desce
+    # open/close Build Mode: rising / falling whoosh
     t = T(0.55)
     sweep = fft_filter(rng.standard_normal(len(t)), sr, bandpass(300, 4000))
     sweep /= np.max(np.abs(sweep))
@@ -409,7 +409,7 @@ def sfx_all():
     close[int(0.2 * sr):] += bell(midi(79), 0.35, 0.18, sr)[:len(t) - int(0.2 * sr)]
     out["build_close"] = fade(close, sr)
 
-    # fita: clique do cassete + rebobinada curtinha
+    # tape: cassette click + short rewind
     t = T(0.9)
     tape = np.zeros(len(t))
     for c0 in (0.0, 0.07):
@@ -420,7 +420,7 @@ def sfx_all():
     tape[s:] += whirr * np.sin(np.pi * tt / tt[-1])
     out["tape_switch"] = fade(tape, sr)
 
-    # passos do Ro (3 variações): baque macio + tique metálico
+    # Ro's footsteps (3 variations): soft thud + metallic tick
     for i in range(3):
         t = T(0.18)
         f = 90 + 15 * i
@@ -428,7 +428,7 @@ def sfx_all():
         tick = np.sin(2 * np.pi * (2400 + 300 * i) * t) * np.exp(-t * 90) * 0.08
         out[f"step_{i + 1}"] = fade(thump + tick, sr, 0.001)
 
-    # cliente chegando: brilhinho "pop"
+    # customer arriving: sparkly "pop"
     t = T(0.6)
     arrive = np.zeros(len(t))
     for i, note in enumerate((84, 91)):
@@ -437,11 +437,11 @@ def sfx_all():
         arrive[s:s + len(b)] += b[:len(arrive) - s]
     out["customer_arrive"] = fade(arrive, sr, 0.001)
 
-    # ingrediente adicionado: "blup"
+    # ingredient added: "blup"
     t = T(0.25)
     out["ingredient"] = fade(np.sin(2 * np.pi * (500 + 700 * t / 0.25) * t) * np.sin(np.pi * t / 0.25) * 0.35, sr)
 
-    # nave passando ao fundo (6 s): ronco grave com efeito doppler
+    # ship passing in the background (6 s): low rumble with a Doppler effect
     t = T(6.0)
     center = 3.0
     doppler = 1 + 0.08 * np.tanh((center - t) * 1.2)
@@ -454,7 +454,7 @@ def sfx_all():
     stereo = np.stack([ship * np.clip(1.2 - t / 4, 0.2, 1), ship * np.clip(t / 4, 0.2, 1)], axis=1)
     out["ship_pass"] = fade(stereo, sr, 0.2, 0.5)
 
-    # ambiente do espaço (loop de 20 s): zumbido suave e ar
+    # space ambience (20 s loop): soft hum and air
     t = T(20.0)
     n = len(t)
     pad = sum(np.sin(2 * np.pi * f * t + p) * a for f, a, p in ((55, 0.25, 0), (82.5, 0.15, 1), (110.2, 0.08, 2)))
@@ -469,8 +469,8 @@ def sfx_all():
 
 
 if __name__ == "__main__":
-    print("Músicas:")
+    print("Music:")
     for spec in TRACKS:
         write_wav(os.path.join(OUT_MUSIC, spec["file"]), render_track(spec), SR_MUSIC)
-    print("Efeitos:")
+    print("Sound effects:")
     sfx_all()

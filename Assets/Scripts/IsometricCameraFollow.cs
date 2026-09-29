@@ -1,34 +1,34 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Câmera isométrica aconchegante:
-// - segue o Ro com Smooth Damp e olha um pouco à frente para onde ele anda;
-// - orbita em volta do quiosque conforme o Ro caminha, ficando sempre do lado dele
-//   (assim o prédio nunca tampa o personagem);
-// - abre um pouco o zoom enquanto ele anda e fecha quando para;
-// - Z/C giram a câmera e a rodinha do mouse dá zoom.
+// Cozy isometric camera:
+// - follows Ro with SmoothDamp and looks slightly ahead of where he walks;
+// - orbits the kiosk as Ro walks, always staying on his side
+//   (so the building never hides the character);
+// - zooms out a little while he walks and back in when he stops;
+// - Z/C rotate the camera and the mouse wheel zooms.
 public class IsometricCameraFollow : MonoBehaviour
 {
     public Transform target;
 
-    [Header("Seguir")]
-    [Tooltip("Tempo para a câmera alcançar o alvo (vibe lenta/suave)")]
+    [Header("Follow")]
+    [Tooltip("Time for the camera to catch up with the target (slow, smooth vibe)")]
     public float smoothTime = 0.35f;
-    [Tooltip("Quanto olhar à frente do movimento (segundos de velocidade)")]
+    [Tooltip("How far to look ahead of the movement (seconds of velocity)")]
     public float lookAhead = 0.45f;
     public float focusHeight = 0.8f;
     public float distance = 30f;
     [Range(15f, 60f)] public float pitch = 32f;
 
-    [Header("Órbita em volta do quiosque")]
+    [Header("Orbit around the kiosk")]
     public bool orbitWithPlayer = true;
-    [Tooltip("Centro da órbita (o prédio do quiosque)")]
+    [Tooltip("Orbit center (the kiosk building)")]
     public Vector3 orbitCenter = new Vector3(0f, 0f, 1.2f);
-    [Tooltip("Ângulo extra para manter a visão diagonal (isométrica) em vez de frontal")]
+    [Tooltip("Extra angle that keeps a diagonal (isometric) view instead of a frontal one")]
     public float yawBias = 25f;
-    [Tooltip("Tempo para a câmera girar até a nova visão")]
+    [Tooltip("Time for the camera to rotate to the new view")]
     public float yawSmoothTime = 1.1f;
-    [Tooltip("Abaixo dessa distância do centro a câmera não gira (evita tremer)")]
+    [Tooltip("Below this distance from the center the camera stops orbiting (avoids jitter)")]
     public float minOrbitRadius = 1.2f;
 
     [Header("Zoom")]
@@ -37,25 +37,25 @@ public class IsometricCameraFollow : MonoBehaviour
     public float zoomSmoothTime = 0.9f;
     public Vector2 zoomLimits = new Vector2(3f, 9f);
 
-    [Header("Modo Construção")]
-    [Tooltip("Visão de cima da ilha inteira (ligada pelo Modo Construção)")]
+    [Header("Build Mode")]
+    [Tooltip("Top-down view of the whole island (enabled by Build Mode)")]
     public bool buildView;
     public Vector3 buildFocus = new Vector3(0f, 0f, -0.3f);
-    [Tooltip("Desloca a ilha para cima na tela, abrindo espaço para o catálogo")]
+    [Tooltip("Shifts the island up on screen to make room for the catalog")]
     public float buildFocusDrop = 2.6f;
     public float buildSize = 8.8f;
     public float buildPitch = 52f;
 
-    [Header("Menu inicial")]
-    [Tooltip("Câmera girando devagar em volta da ilha (tela inicial)")]
+    [Header("Title menu")]
+    [Tooltip("Camera slowly circling the island (title screen)")]
     public bool menuView;
     public float menuSpinSpeed = 5f;
     public float menuSize = 7.6f;
     public float menuPitch = 26f;
-    [Tooltip("Desloca a ilha para a direita da tela (o menu fica à esquerda)")]
+    [Tooltip("Shifts the island to the right of the screen (the menu sits on the left)")]
     public float menuSideShift = 4.2f;
 
-    [Header("Controles manuais")]
+    [Header("Manual controls")]
     public float manualRotateSpeed = 90f;
     public float scrollZoomStep = 0.5f;
 
@@ -85,7 +85,7 @@ public class IsometricCameraFollow : MonoBehaviour
         Vector3 fromCenter = target.position - orbitCenter;
         fromCenter.y = 0f;
         if (fromCenter.magnitude < minOrbitRadius) return orbitYaw;
-        // câmera do mesmo lado que o Ro, olhando em direção ao quiosque
+        // camera on Ro's side, looking toward the kiosk
         float radial = Mathf.Atan2(-fromCenter.x, -fromCenter.z) * Mathf.Rad2Deg;
         return radial + yawBias;
     }
@@ -107,7 +107,7 @@ public class IsometricCameraFollow : MonoBehaviour
             return;
         }
 
-        // controles manuais
+        // manual controls
         var kb = Keyboard.current;
         if (kb != null)
         {
@@ -121,19 +121,19 @@ public class IsometricCameraFollow : MonoBehaviour
             if (Mathf.Abs(scroll) > 0.01f) zoomOffset -= Mathf.Sign(scroll) * scrollZoomStep;
         }
 
-        // foco com olhar à frente
+        // focus with look-ahead
         Vector3 vel = targetRb != null ? targetRb.linearVelocity : Vector3.zero;
         vel.y = 0f;
         Vector3 flatForward = Quaternion.Euler(0f, yaw, 0f) * Vector3.forward;
         Vector3 desiredFocus = buildView ? buildFocus - flatForward * buildFocusDrop : target.position + Vector3.up * focusHeight + vel * lookAhead;
         focus = Vector3.SmoothDamp(focus, desiredFocus, ref focusVel, smoothTime);
 
-        // giro da câmera acompanhando o caminho do Ro
+        // camera yaw following Ro's path
         if (orbitWithPlayer && !buildView) orbitYaw = DesiredYaw();
         float desiredYaw = orbitYaw + manualYaw;
         yaw = Mathf.SmoothDampAngle(yaw, desiredYaw, ref yawVel, yawSmoothTime);
 
-        // zoom: abre andando, fecha parado
+        // zoom: out while walking, in when idle
         float moving = Mathf.Clamp01(vel.magnitude / 2.5f);
         float baseSize = buildView ? buildSize : Mathf.Lerp(idleSize, movingSize, moving);
         float desiredSize = Mathf.Clamp(baseSize + zoomOffset, zoomLimits.x, zoomLimits.y);

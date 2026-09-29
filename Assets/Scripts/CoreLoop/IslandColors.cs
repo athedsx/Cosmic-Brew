@@ -1,7 +1,7 @@
 using UnityEngine;
 
-// Cores personalizáveis da ilha (deck, borda, quiosque), trocadas no Modo Construção.
-// Usa cópias dos materiais em tempo de execução, então os arquivos de material não mudam.
+// Customizable island colors (deck, rim, kiosk), changed in Build Mode.
+// Uses runtime material copies, so the material assets are never modified.
 public class IslandColors : MonoBehaviour
 {
     public static IslandColors Instance { get; private set; }
@@ -9,9 +9,9 @@ public class IslandColors : MonoBehaviour
     [System.Serializable]
     public class Swatch
     {
-        [Tooltip("Identificador (usado no save)")]
+        [Tooltip("Identifier (used in the save file)")]
         public string name;
-        [Tooltip("Chave de tradução, ex.: color.pink")]
+        [Tooltip("Localization key, e.g. color.pink")]
         public string key;
         public Color color = Color.white;
 
@@ -22,10 +22,10 @@ public class IslandColors : MonoBehaviour
     public class Target
     {
         public string name;
-        [Tooltip("Chave de tradução, ex.: colors.deck")]
+        [Tooltip("Localization key, e.g. colors.deck")]
         public string nameKey;
         public Renderer[] renderers;
-        [Tooltip("A primeira opção é a cor original")]
+        [Tooltip("The first option is the original color")]
         public Swatch[] swatches;
         [System.NonSerialized] public int current;
 
@@ -33,7 +33,7 @@ public class IslandColors : MonoBehaviour
     }
 
     public Target[] targets;
-    [Tooltip("Preço de cada troca de cor, em Moedas Estelares")]
+    [Tooltip("Cost of each color change, in Star Coins")]
     public int changeCost = 5;
 
     void Awake() => Instance = this;
@@ -52,7 +52,7 @@ public class IslandColors : MonoBehaviour
         }
     }
 
-    // Qual parte da ilha foi clicada (-1 = nenhuma)
+    // Which island part was clicked (-1 = none)
     public int FindTarget(Transform hit)
     {
         if (hit == null) return -1;
@@ -62,7 +62,7 @@ public class IslandColors : MonoBehaviour
         return -1;
     }
 
-    // nomes das cores atuais (para o save)
+    // current color names (for the save file)
     public string[] CurrentNames()
     {
         var names = new string[targets.Length];

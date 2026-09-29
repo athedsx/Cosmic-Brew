@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Rádio interativo (GDD): o Ro vai até ele e "troca a fita" para mudar a música lo-fi
+// Interactive radio (GDD): Ro walks up and "swaps the tape" to change the lo-fi track
 public class RadioStation : Interactable
 {
     private Transform model;
@@ -12,7 +12,7 @@ public class RadioStation : Interactable
         if (model != null) baseScale = model.localScale;
     }
 
-    // o rádio dá pulinhos a cada toque
+    // the radio hops on every tap
     public override void OnWorkProgress(PlayerCarry player, float p)
     {
         if (model == null) return;

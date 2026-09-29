@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Passinhos do Ro sincronizados com a animação de caminhada
+// Ro's footsteps, synced with the walk animation
 [RequireComponent(typeof(RoAnimator))]
 public class RoFootsteps : MonoBehaviour
 {
@@ -16,7 +16,7 @@ public class RoFootsteps : MonoBehaviour
     void Update()
     {
         float s = Mathf.Sin(anim.WalkPhase);
-        // um passo cada vez que a perna cruza o meio do balanço
+        // one step each time a leg crosses the middle of the swing
         if (anim.WalkBlend > 0.3f && Mathf.Sign(s) != Mathf.Sign(lastSin) && AudioManager.Instance != null)
         {
             AudioManager.Instance.Play("step", transform.position, volume * anim.WalkBlend);

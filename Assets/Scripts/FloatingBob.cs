@@ -1,11 +1,11 @@
 using UnityEngine;
 
-// Balanço suave de flutuação (quiosque, planetas, naves ao fundo)
+// Gentle floating bob (kiosk, planets, background ships)
 public class FloatingBob : MonoBehaviour
 {
     public float amplitude = 0.15f;
     public float frequency = 0.25f;
-    public float rotationSpeed = 0f; // graus por segundo no eixo Y
+    public float rotationSpeed = 0f; // degrees per second around Y
 
     private Vector3 startPos;
     private float phase;

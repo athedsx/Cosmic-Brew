@@ -2,17 +2,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-// UI do jogo (uGUI, montada por código):
-// HUD de Moedas Estelares, xícara atual, dica de controles,
-// aviso "E · ação" sobre o objeto próximo, balões de pedido sobre os clientes e textos flutuantes.
+// In-game UI (uGUI, built in code):
+// Star Coin HUD, current cup, controls hint,
+// "E · action" prompt over the nearest object, order bubbles over customers and floating texts.
 public class GameUI : MonoBehaviour
 {
     public static GameUI Instance { get; private set; }
 
-    [Header("Moeda 3D no HUD")]
-    [Tooltip("Modelo da Moeda Estelar (clonado e renderizado ao vivo no canto da tela)")]
+    [Header("3D coin in the HUD")]
+    [Tooltip("Star Coin model (cloned and rendered live in the screen corner)")]
     public GameObject hudCoinModel;
-    [Tooltip("Camada usada só pela moeda do HUD (a câmera principal não vê essa camada)")]
+    [Tooltip("Layer used only by the HUD coin (hidden from the main camera)")]
     public int hudCoinLayer = 31;
 
     static readonly Color Cream = new Color(1f, 0.97f, 0.93f, 0.97f);
@@ -32,7 +32,7 @@ public class GameUI : MonoBehaviour
     private float coinPunch;
     private Transform hudCoin;
     private RenderTexture hudCoinRT;
-    private float coinSpin; // giro extra (graus) ao ganhar moedas
+    private float coinSpin; // extra spin (degrees) when coins are earned
     private Text cupText, hintText;
     private RectTransform cupPanel;
 
@@ -50,7 +50,7 @@ public class GameUI : MonoBehaviour
     private CanvasGroup toastGroup;
     private float toastStart = -10f;
 
-    // tradução: todos os textos criados (para trocar a fonte) + textos ligados a uma chave
+    // localization: every created text (to swap fonts) + texts bound to a key
     private readonly List<Text> texts = new List<Text>();
     private readonly HashSet<Text> fixedFont = new HashSet<Text>();
     private readonly Dictionary<Text, FontStyle> styles = new Dictionary<Text, FontStyle>();
@@ -82,7 +82,7 @@ public class GameUI : MonoBehaviour
         if (Instance == this) Instance = null;
     }
 
-    // ---------------- construção ----------------
+    // ---------------- building blocks ----------------
     public RectTransform Panel(string name, Transform parent, Sprite sprite, Color color, Vector2 size)
     {
         var go = new GameObject(name, typeof(RectTransform), typeof(Image));
@@ -118,14 +118,14 @@ public class GameUI : MonoBehaviour
         return t;
     }
 
-    // Texto que se atualiza sozinho quando o idioma muda
+    // Text that refreshes itself when the language changes
     public void Bind(Text t, System.Func<string> getText)
     {
         bindings.Add(new KeyValuePair<Text, System.Func<string>>(t, getText));
         t.text = getText();
     }
 
-    // Texto com fonte fixa (ex.: nome de cada idioma escrito na própria língua)
+    // Text with a fixed font (e.g. each language name written in its own script)
     public void FixFont(Text t, Font f)
     {
         t.font = f;
@@ -179,12 +179,12 @@ public class GameUI : MonoBehaviour
 
     void BuildHud()
     {
-        // Moedas Estelares (canto superior esquerdo)
+        // Star Coins (top-left corner)
         coinPanel = Panel("Moedas", root, UISprites.Rounded, Night, new Vector2(300, 84));
         Anchor(coinPanel, new Vector2(0, 1), new Vector2(0, 1), new Vector2(32, -32));
         if (!BuildHudCoin())
         {
-            // sem o modelo 3D: estrela desenhada
+            // no 3D model: fall back to a drawn star
             var star = Panel("Estrela", coinPanel, UISprites.Star, Gold, new Vector2(56, 56));
             Anchor(star, new Vector2(0, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(46, 0));
         }
@@ -196,19 +196,19 @@ public class GameUI : MonoBehaviour
         sub.rectTransform.sizeDelta = new Vector2(200, 24);
         Anchor(sub.rectTransform, new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(88, -22));
 
-        // xícara atual (embaixo, no centro)
+        // current cup (bottom center)
         var cup = cupPanel = Panel("Xicara", root, UISprites.Rounded, Night, new Vector2(680, 64));
         Anchor(cup, new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(0, 32));
         cupText = Label("Texto", cup, "", 24, Cream, TextAnchor.MiddleCenter);
         Stretch(cupText.rectTransform, 16, 16);
 
-        // dica de controles (canto superior direito)
+        // controls hint (top-right corner)
         var hint = hintText = Label("Controles", root, Loc.Get("hint.play"), 18, new Color(1f, 1f, 1f, 0.6f), TextAnchor.UpperRight, FontStyle.Normal);
         hint.rectTransform.sizeDelta = new Vector2(900, 30);
         Anchor(hint.rectTransform, new Vector2(1, 1), new Vector2(1, 1), new Vector2(-32, -36));
     }
 
-    // Moeda Estelar 3D: um mini "estúdio" longe da ilha, com câmera própria renderizando numa textura
+    // 3D Star Coin: a mini "studio" far from the island with its own camera rendering to a texture
     bool BuildHudCoin()
     {
         if (hudCoinModel == null) return false;
@@ -248,7 +248,7 @@ public class GameUI : MonoBehaviour
         key.color = new Color(1f, 0.95f, 0.88f);
         key.cullingMask = mask;
 
-        // a câmera principal não enxerga a moeda do HUD
+        // the main camera does not see the HUD coin
         if (Camera.main != null) Camera.main.cullingMask &= ~mask;
 
         var go = new GameObject("MoedaImagem", typeof(RectTransform), typeof(RawImage));
@@ -286,7 +286,7 @@ public class GameUI : MonoBehaviour
 
     // ---------------- API ----------------
 
-    // Tela inicial: esconde o HUD (moedas, xícara, dicas, balões)
+    // Title screen: hides the HUD (coins, cup, hints, bubbles)
     public void SetHudVisible(bool visible)
     {
         if (coinPanel != null) coinPanel.gameObject.SetActive(visible);
@@ -296,7 +296,7 @@ public class GameUI : MonoBehaviour
         if (!visible) HidePrompt();
     }
 
-    // Aviso discreto no canto (ex.: "Jogo salvo")
+    // Subtle corner toast (e.g. "Game saved")
     public void ShowToast(string text)
     {
         if (toast == null)
@@ -314,7 +314,7 @@ public class GameUI : MonoBehaviour
         toastStart = Time.unscaledTime;
     }
 
-    // Modo Construção: esconde a xícara e troca a dica de controles
+    // Build Mode: hides the cup and swaps the controls hint
     public void SetBuildHud(bool building)
     {
         if (cupPanel != null) cupPanel.gameObject.SetActive(!building);
@@ -322,7 +322,7 @@ public class GameUI : MonoBehaviour
         if (hintText != null)
         {
             hintText.text = Loc.Get(building ? "hint.build" : "hint.play");
-            // construindo: a faixa ocupa o topo, então a dica vai logo abaixo dela, centralizada
+            // while building the banner takes the top, so the hint sits centered just below it
             if (building) Anchor(hintText.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -92f));
             else Anchor(hintText.rectTransform, new Vector2(1, 1), new Vector2(1, 1), new Vector2(-32, -36));
             hintText.alignment = building ? TextAnchor.UpperCenter : TextAnchor.UpperRight;
@@ -352,7 +352,7 @@ public class GameUI : MonoBehaviour
         cupText.text = Loc.Get("cup.label") + " " + string.Join(" + ", parts) + (match != null ? $"   <color=#8ee6c4>= {match.Name}</color>" : "");
     }
 
-    // progress < 0: aviso normal; progress >= 0: barra de progresso da ação
+    // progress < 0: plain prompt; progress >= 0: action progress bar
     public void SetPrompt(Vector3 world, string text, bool enabled, float progress)
     {
         promptVisible = true;
@@ -390,7 +390,7 @@ public class GameUI : MonoBehaviour
     {
         var rt = Panel("Balao", root, UISprites.Rounded, Cream, new Vector2(220, 92));
         rt.pivot = new Vector2(0.5f, 0f);
-        rt.SetSiblingIndex(0); // atrás do aviso e do HUD
+        rt.SetSiblingIndex(0); // behind the prompt and the HUD
         var dot1 = Panel("Bolinha1", rt, UISprites.Circle, Cream, new Vector2(20, 20));
         Anchor(dot1, new Vector2(0.5f, 0f), new Vector2(0.5f, 0.5f), new Vector2(-18, -14));
         var dot2 = Panel("Bolinha2", rt, UISprites.Circle, Cream, new Vector2(11, 11));
@@ -402,7 +402,7 @@ public class GameUI : MonoBehaviour
         return b;
     }
 
-    // ---------------- posicionamento na tela ----------------
+    // ---------------- screen placement ----------------
     void LateUpdate()
     {
         var cam = Camera.main;
@@ -437,7 +437,7 @@ public class GameUI : MonoBehaviour
         coinPunch = Mathf.MoveTowards(coinPunch, 0f, Time.unscaledDeltaTime * 3f);
         coinPanel.localScale = Vector3.one * (1f + 0.12f * Mathf.Sin(coinPunch * Mathf.PI));
 
-        // moeda 3D: balança devagar e dá um giro completo ao ganhar moedas
+        // 3D coin: sways slowly and spins a full turn when coins are earned
         if (hudCoin != null)
         {
             coinSpin = Mathf.MoveTowards(coinSpin, 0f, Time.unscaledDeltaTime * Mathf.Max(360f, coinSpin * 2.5f));
@@ -459,13 +459,13 @@ public class GameUI : MonoBehaviour
 
     public Canvas Canvas => canvas;
 
-    // dica de controles no canto (o trailer esconde)
+    // corner controls hint (hidden by the trailer)
     public void SetHintVisible(bool visible)
     {
         if (hintText != null) hintText.gameObject.SetActive(visible);
     }
 
-    // ---------------- tipos ----------------
+    // ---------------- types ----------------
     class FloatText
     {
         public RectTransform rt;

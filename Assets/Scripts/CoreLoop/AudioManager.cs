@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Áudio do jogo: rádio lo-fi (várias fitas com crossfade), ambiente do espaço,
-// naves passando ao fundo e efeitos sonoros (2D, com pan pela posição na tela).
+// Game audio: lo-fi radio (several tapes with crossfade), space ambience,
+// ships passing in the background and sound effects (2D, panned by screen position).
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
@@ -12,7 +12,7 @@ public class AudioManager : MonoBehaviour
     public class Track
     {
         public string title;
-        [Tooltip("Chave de tradução do título, ex.: music.1")]
+        [Tooltip("Localization key for the title, e.g. music.1")]
         public string titleKey;
         public AudioClip clip;
     }
@@ -21,26 +21,26 @@ public class AudioManager : MonoBehaviour
     public class Sfx
     {
         public string name;
-        [Tooltip("sfx ou characters (passos e vozes)")]
+        [Tooltip("sfx or characters (footsteps and voices)")]
         public string category = "sfx";
         public AudioClip[] clips;
         [Range(0f, 1f)] public float volume = 0.7f;
         public float pitchVariance = 0.05f;
     }
 
-    [Header("Rádio (música)")]
+    [Header("Radio (music)")]
     public Track[] tracks;
     [Range(0f, 1f)] public float musicVolume = 0.5f;
     public float crossfadeTime = 1.6f;
 
-    [Header("Ambiente")]
+    [Header("Ambience")]
     public AudioClip ambience;
     [Range(0f, 1f)] public float ambienceVolume = 0.22f;
     public AudioClip shipPass;
     [Range(0f, 1f)] public float shipVolume = 0.5f;
     public Vector2 shipInterval = new Vector2(35f, 75f);
 
-    [Header("Efeitos")]
+    [Header("Sound effects")]
     public Sfx[] sfx;
     [Range(0f, 1f)] public float sfxVolume = 0.9f;
 
@@ -93,7 +93,7 @@ public class AudioManager : MonoBehaviour
         var kb = Keyboard.current;
         if (kb != null && kb.mKey.wasPressedThisFrame) SetMusicOn(!MusicOn);
 
-        // volume da música (liga/desliga suave) + crossfade entre fitas
+        // music volume (smooth on/off) + crossfade between tapes
         musicLevel = Mathf.MoveTowards(musicLevel, MusicOn ? 1f : 0f, Time.unscaledDeltaTime / 0.6f);
         float step = Time.unscaledDeltaTime / Mathf.Max(0.01f, crossfadeTime);
         levelA = Mathf.MoveTowards(levelA, active == musicA ? 1f : 0f, step);
@@ -105,7 +105,7 @@ public class AudioManager : MonoBehaviour
         if (active != musicA && levelA <= 0f && musicA.isPlaying) musicA.Stop();
         if (active != musicB && levelB <= 0f && musicB.isPlaying) musicB.Stop();
 
-        // de vez em quando uma nave passa ao fundo
+        // every now and then a ship passes in the background
         if (shipPass != null && Time.time >= nextShip)
         {
             Play(shipPass, shipVolume * GameSettings.Ambience / Mathf.Max(0.01f, GameSettings.Sfx), Random.Range(0.85f, 1.1f), Random.Range(-0.6f, 0.6f));
@@ -113,7 +113,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    // ------------------------------------------------------------------ música
+    // ------------------------------------------------------------------ music
     public void PlayTrack(int index, bool announce = true)
     {
         if (tracks == null || tracks.Length == 0) return;
@@ -122,7 +122,7 @@ public class AudioManager : MonoBehaviour
         bool first = active == null;
         next.clip = tracks[index].clip;
         next.Play();
-        if (next == musicA) levelA = first ? 1f : 0f; else levelB = first ? 1f : 0f; // primeira música: sem fade
+        if (next == musicA) levelA = first ? 1f : 0f; else levelB = first ? 1f : 0f; // first track: no fade
         active = next;
         CurrentTrack = index;
         if (announce && GameUI.Instance != null) GameUI.Instance.ShowToast(Loc.Get("toast.track", CurrentTitle));
@@ -141,7 +141,7 @@ public class AudioManager : MonoBehaviour
         if (SaveSystem.Instance != null) SaveSystem.Instance.MarkDirty();
     }
 
-    // ------------------------------------------------------------------ efeitos
+    // ------------------------------------------------------------------ sound effects
     public void Play(string name, Vector3? worldPos = null, float volumeScale = 1f, float delay = 0f)
     {
         if (!byName.TryGetValue(name, out var s) || s.clips == null || s.clips.Length == 0) return;
@@ -151,7 +151,7 @@ public class AudioManager : MonoBehaviour
         Play(clip, s.volume * volumeScale * category, pitch, worldPos.HasValue ? PanFor(worldPos.Value) : 0f, delay);
     }
 
-    // nave de cliente chegando/saindo (usa o mesmo som das naves ao fundo)
+    // customer ship arriving/leaving (reuses the background ship sound)
     public void PlayShip(Vector3 worldPos, float volumeScale = 1f)
     {
         Play(shipPass, shipVolume * volumeScale * GameSettings.Ambience / Mathf.Max(0.01f, GameSettings.Sfx), Random.Range(1.05f, 1.25f), PanFor(worldPos));

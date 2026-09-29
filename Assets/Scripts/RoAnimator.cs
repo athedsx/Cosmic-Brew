@@ -1,38 +1,38 @@
 using UnityEngine;
 
-// Ações com animação própria (definidas em cada estação/cliente)
+// Actions with their own animation (set by each station/customer)
 public enum RoAction { None, Brew, Grind, Trash, Radio, Serve }
 
-// Animação procedural do Ro (peças rígidas): idle "cansado aconchegante" e caminhada,
-// misturados pela velocidade do Rigidbody.
+// Procedural animation for Ro (rigid parts): a "cozy tired" idle and a walk cycle,
+// blended by the Rigidbody speed.
 public class RoAnimator : MonoBehaviour
 {
-    [Header("Peças (preenchidas automaticamente pelo nome)")]
+    [Header("Parts (auto-filled by name)")]
     public Transform hips, head, armL, armR, legL, legR;
 
-    [Header("Idle cansado")]
-    [Tooltip("Ângulo dos braços caídos ao lado do corpo (saindo da Pose T)")]
+    [Header("Tired idle")]
+    [Tooltip("Angle of the arms hanging at the sides (from the T-pose)")]
     public float armRestAngle = 74f;
-    public float slumpAngle = 5f;         // tronco inclinado para frente
-    public float headDroop = 10f;         // cabeça caída
-    public float breathRate = 0.22f;      // respirações por segundo
+    public float slumpAngle = 5f;         // torso leaning forward
+    public float headDroop = 10f;         // drooping head
+    public float breathRate = 0.22f;      // breaths per second
     public Vector2 sighInterval = new Vector2(6f, 10f);
 
-    [Header("Caminhada")]
+    [Header("Walk")]
     public float maxSpeed = 3.5f;
     public float stepsPerSecond = 1.6f;
     public float legSwing = 28f;
     public float armSwing = 22f;
     public float bobHeight = 0.018f;
 
-    [Header("Ações (controladas pelo core loop)")]
-    [Tooltip("Segurando a xícara: braços para frente")]
+    [Header("Actions (driven by the core loop)")]
+    [Tooltip("Holding the cup: arms forward")]
     public bool holding;
-    [Tooltip("Mexendo numa estação: braços trabalhando e cabeça olhando para baixo")]
+    [Tooltip("Working at a station: busy arms and head looking down")]
     public bool working;
-    [Tooltip("Qual ação está fazendo (define a animação dos braços)")]
+    [Tooltip("Current action (drives the arm animation)")]
     public RoAction action;
-    [Tooltip("Progresso da ação, 0..1")]
+    [Tooltip("Action progress, 0..1")]
     [Range(0f, 1f)] public float actionProgress;
 
     private float holdBlend, workBlend;
@@ -70,14 +70,14 @@ public class RoAnimator : MonoBehaviour
         float dt = Time.deltaTime;
         float t = Time.time;
 
-        // velocidade horizontal -> mistura idle/caminhada
+        // horizontal speed -> idle/walk blend
         float speed = 0f;
         if (rb != null) { Vector3 v = rb.linearVelocity; v.y = 0f; speed = v.magnitude; }
         float target = Mathf.Clamp01(speed / (maxSpeed * 0.6f));
         walkBlend = Mathf.Lerp(walkBlend, target, 1f - Mathf.Exp(-8f * dt));
         phase += dt * stepsPerSecond * Mathf.Lerp(0.6f, 1.2f, target) * Mathf.PI * 2f * walkBlend;
 
-        // suspiro de cansaço ocasional (só parado)
+        // occasional tired sigh (only when standing still)
         if (t > nextSigh && walkBlend < 0.1f) { sighStart = t; nextSigh = t + SighDuration + Random.Range(sighInterval.x, sighInterval.y); }
         float u = (t - sighStart) / SighDuration;
         float sigh = (u >= 0f && u <= 1f) ? Mathf.Sin(u * Mathf.PI) : 0f;
@@ -90,7 +90,7 @@ public class RoAnimator : MonoBehaviour
         ApplyPose(t, walkBlend, phase, sigh);
     }
 
-    // Pose determinística (também usada para pré-visualizar no editor)
+    // Deterministic pose (also used for editor previews)
     public void ApplyPose(float t, float walkBlend, float phase, float sigh)
     {
         if (hips == null) return;
@@ -98,7 +98,7 @@ public class RoAnimator : MonoBehaviour
         float s = Mathf.Sin(phase);
         float bounce = Mathf.Abs(Mathf.Sin(phase));
 
-        // ---------- tronco ----------
+        // ---------- torso ----------
         float idleLean = slumpAngle + breath * 1.2f + sigh * 7f;
         float walkLean = 7f;
         float lean = Mathf.Lerp(idleLean, walkLean, walkBlend);
@@ -108,11 +108,11 @@ public class RoAnimator : MonoBehaviour
         float walkY = bounce * bobHeight;
         hips.localPosition = hipsBase + Vector3.up * Mathf.Lerp(idleY, walkY, walkBlend);
 
-        // ---------- cabeça ----------
+        // ---------- head ----------
         if (head != null)
         {
             float idlePitch = headDroop + breath * 2f + sigh * 10f;
-            float idleYaw = Mathf.Sin(t * 0.27f) * 10f + Mathf.Sin(t * 0.61f) * 3f;   // olhando em volta, sem pressa
+            float idleYaw = Mathf.Sin(t * 0.27f) * 10f + Mathf.Sin(t * 0.61f) * 3f;   // looking around, unhurried
             float idleRoll = Mathf.Sin(t * 0.4f) * 4f;
             float walkPitch = 4f + bounce * 3f;
             float actionPitch = action == RoAction.Brew || action == RoAction.Grind ? 12f
@@ -124,10 +124,10 @@ public class RoAnimator : MonoBehaviour
             head.localPosition = headBase;
         }
 
-        // ---------- braços (caídos + balanço) ----------
+        // ---------- arms (hanging + swing) ----------
         float idleArm = breath * 2f + sigh * 4f;
         float swing = s * armSwing * walkBlend * (1f - 0.8f * holdBlend);
-        // segurando a xícara: braços para frente; trabalhando: braços mexendo alternados
+        // holding the cup: arms forward; working: arms moving alternately
         float carry = -55f * holdBlend;
         ActionArms(t, out float workL, out float workR, out float zL, out float zR);
         workL *= workBlend; workR *= workBlend; zL *= workBlend; zR *= workBlend;
@@ -135,7 +135,7 @@ public class RoAnimator : MonoBehaviour
         if (armL != null) armL.localRotation = Quaternion.Euler(-swing + idleArm * 0.5f + Mathf.Min(carry, 0f) * (1f - workBlend) + workL, 0f, 0f) * Quaternion.Euler(0f, 0f, armRestAngle - idleArm + inward + zL);
         if (armR != null) armR.localRotation = Quaternion.Euler(swing + idleArm * 0.5f + Mathf.Min(carry, 0f) * (1f - workBlend) + workR, 0f, 0f) * Quaternion.Euler(0f, 0f, -armRestAngle + idleArm - inward - zR);
 
-        // ---------- pernas ----------
+        // ---------- legs ----------
         float leg = s * legSwing * walkBlend;
         if (legL != null) legL.localRotation = Quaternion.Euler(leg, 0f, 0f);
         if (legR != null) legR.localRotation = Quaternion.Euler(-leg, 0f, 0f);
@@ -144,7 +144,7 @@ public class RoAnimator : MonoBehaviour
     static float Ease(float x) => Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(x));
     static float Bump(float x) => x <= 0f || x >= 1f ? 0f : Mathf.Sin(x * Mathf.PI);
 
-    // Braços de cada ação. X negativo = braço para frente; z = braço para dentro.
+    // Arm poses per action. Negative X = arm forward; z = arm inward.
     void ActionArms(float t, out float xL, out float xR, out float zL, out float zR)
     {
         float p = actionProgress;
@@ -153,10 +153,10 @@ public class RoAnimator : MonoBehaviour
         {
             case RoAction.Brew:
             {
-                // estica até a máquina, aperta o botão e espera balançando no ritmo
+                // reaches for the machine, presses the button and waits, swaying to the beat
                 float reach = Ease(p / 0.2f);
                 xL = xR = -62f * reach;
-                xR += 22f * Bump((p - 0.24f) / 0.18f);           // aperta o botão
+                xR += 22f * Bump((p - 0.24f) / 0.18f);           // presses the button
                 float wait = Ease((p - 0.45f) / 0.1f);
                 xL += Mathf.Sin(t * 5f) * 4f * wait;
                 xR += Mathf.Sin(t * 5f + 1f) * 4f * wait;
@@ -164,7 +164,7 @@ public class RoAnimator : MonoBehaviour
             }
             case RoAction.Grind:
             {
-                // mão esquerda segura o moedor; a direita gira a manivela
+                // left hand holds the grinder; the right one turns the crank
                 float reach = Ease(p / 0.15f);
                 float ang = p * Mathf.PI * 2f * 2.5f;
                 xL = -52f * reach;
@@ -175,7 +175,7 @@ public class RoAnimator : MonoBehaviour
             }
             case RoAction.Trash:
             {
-                // levanta a xícara, vira para despejar e abaixa
+                // lifts the cup, tips it to pour and lowers it
                 float lift = p < 0.6f ? Ease(p / 0.35f) : 1f - Ease((p - 0.6f) / 0.35f);
                 xL = xR = -58f - 40f * lift;
                 xR -= 12f * Bump((p - 0.38f) / 0.25f);
@@ -183,7 +183,7 @@ public class RoAnimator : MonoBehaviour
             }
             case RoAction.Radio:
             {
-                // dois toquinhos no botão do rádio
+                // two taps on the radio button
                 float reach = Ease(p / 0.2f) * (1f - Ease((p - 0.85f) / 0.15f));
                 xL = -8f * reach;
                 xR = -72f * reach + 16f * Mathf.Abs(Mathf.Sin(Mathf.Clamp01((p - 0.2f) / 0.6f) * Mathf.PI * 2f));
@@ -191,7 +191,7 @@ public class RoAnimator : MonoBehaviour
             }
             case RoAction.Serve:
             {
-                // estica os braços oferecendo a xícara
+                // stretches the arms out offering the cup
                 float ext = Ease(p / 0.55f);
                 xL = xR = -55f - 30f * ext;
                 zL = zR = 6f * ext;

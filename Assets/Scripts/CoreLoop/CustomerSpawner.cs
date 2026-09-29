@@ -1,40 +1,40 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Faz clientes chegarem pela borda da ilha e ocuparem os banquinhos livres.
-// Os banquinhos podem ser adicionados/removidos no Modo Construção.
+// Brings customers in from the island edge to take free stools.
+// Stools can be added or removed in Build Mode.
 public class CustomerSpawner : MonoBehaviour
 {
-    [Tooltip("Cliente modelo (fica desativado; é clonado a cada chegada)")]
+    [Tooltip("Customer template (kept disabled; cloned on each arrival)")]
     public GameObject customerTemplate;
-    [Tooltip("Outros tipos de cliente (astronauta, robô...); sorteados junto com o modelo acima")]
+    [Tooltip("Other customer types (astronaut, robot...), picked at random along with the template above")]
     public GameObject[] extraTemplates;
-    [Tooltip("Nave que traz o cliente (vazio = cliente aparece direto na borda)")]
+    [Tooltip("Ship that brings the customer (empty = customer appears at the edge)")]
     public GameObject shipTemplate;
-    [Tooltip("Distância além da borda onde a nave estaciona")]
+    [Tooltip("Distance past the edge where the ship parks")]
     public float shipParkOffset = 1.7f;
-    [Tooltip("Altura em que a nave flutua estacionada")]
+    [Tooltip("Height at which the parked ship hovers")]
     public float shipParkHeight = -0.35f;
-    [Tooltip("Banquinhos onde os clientes esperam")]
+    [Tooltip("Stools where customers wait")]
     public List<Transform> seats = new List<Transform>();
     public float firstDelay = 2f;
     public Vector2 spawnInterval = new Vector2(6f, 12f);
-    [Tooltip("Para onde os clientes olham enquanto esperam (área de trabalho do Ro)")]
+    [Tooltip("Where waiting customers look (Ro's work area)")]
     public Vector3 lookAt = new Vector3(0f, 0f, -1.6f);
-    [Tooltip("Centro da ilha")]
+    [Tooltip("Island center")]
     public Vector3 islandCenter = Vector3.zero;
-    [Tooltip("Distância do centro até a borda por onde chegam e vão embora")]
+    [Tooltip("Distance from the center to the edge where customers arrive and leave")]
     public float edgeRadius = 7.0f;
-    [Tooltip("Distância atrás do banquinho onde o cliente fica")]
+    [Tooltip("Distance behind the stool where the customer stands")]
     public float standBehind = 0.7f;
 
-    [Tooltip("Pausado no Modo Construção: não chega ninguém novo")]
+    [Tooltip("Paused in Build Mode: nobody new arrives")]
     public bool paused;
 
     private readonly HashSet<Transform> occupied = new HashSet<Transform>();
     private float nextSpawn;
 
-    // naves a caminho: o cliente só desce quando a nave estaciona
+    // ships on the way: the customer steps off only once the ship parks
     class Arrival { public ShipArrival ship; public Transform seat; }
     private readonly List<Arrival> arrivals = new List<Arrival>();
 
@@ -53,7 +53,7 @@ public class CustomerSpawner : MonoBehaviour
             var a = arrivals[i];
             if (a.ship == null) { FreeSeat(a.seat); arrivals.RemoveAt(i); continue; }
             if (paused || !a.ship.Parked) continue;
-            // o banquinho pode ter sido guardado no Modo Construção
+            // the stool may have been stored in Build Mode
             if (a.seat == null || !a.seat.gameObject.activeInHierarchy) { a.ship.Depart(); FreeSeat(a.seat); }
             else Spawn(a.seat, a.ship);
             arrivals.RemoveAt(i);
@@ -67,7 +67,7 @@ public class CustomerSpawner : MonoBehaviour
         nextSpawn = Time.time + Random.Range(spawnInterval.x, spawnInterval.y);
     }
 
-    // traz um cliente agora (se tiver banquinho livre); usado pelo trailer
+    // brings a customer right now (if a stool is free); used by the trailer
     public ShipArrival ArriveNow()
     {
         var seat = RandomFreeSeat();
@@ -109,8 +109,8 @@ public class CustomerSpawner : MonoBehaviour
         return free.Count > 0 ? free[Random.Range(0, free.Count)] : null;
     }
 
-    // Onde o cliente espera (atrás do banquinho) e por onde chega/vai embora (borda da ilha).
-    // Caminho fixo, para o Modo Construção poder reservar esse espaço.
+    // Where the customer waits (behind the stool) and where they arrive/leave (island edge).
+    // A fixed path, so Build Mode can keep that space clear.
     public void GetCustomerPath(Vector3 seatPosition, out Vector3 stand, out Vector3 entry)
     {
         Vector3 seatPos = new Vector3(seatPosition.x, 0f, seatPosition.z);
@@ -148,7 +148,7 @@ public class CustomerSpawner : MonoBehaviour
         if (seat != null && !seats.Contains(seat)) seats.Add(seat);
     }
 
-    // false se tem alguém usando o banquinho
+    // false if someone is using the stool
     public bool RemoveSeat(Transform seat)
     {
         if (IsSeatOccupied(seat)) return false;

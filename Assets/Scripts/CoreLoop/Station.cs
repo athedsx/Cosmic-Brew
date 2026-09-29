@@ -1,16 +1,16 @@
 using UnityEngine;
 
-// Estação que adiciona um ingrediente na xícara (máquina de café, moedor de poeira estelar...)
+// Station that adds an ingredient to the cup (coffee machine, stardust grinder...)
 public class Station : Interactable
 {
     public Ingredient ingredient;
-    [Tooltip("Chave de tradução da ação no aviso, ex.: station.coffee")]
+    [Tooltip("Localization key for the prompt action, e.g. station.coffee")]
     public string actionText = "station.coffee";
 
     public enum Fx { None, Steam, Stardust }
-    [Tooltip("Efeito visual enquanto o Ro prepara")]
+    [Tooltip("Visual effect while Ro prepares")]
     public Fx fx = Fx.None;
-    [Tooltip("Altura (acima da mesa) de onde sai o efeito")]
+    [Tooltip("Height (above the table) where the effect spawns")]
     public float fxHeight = 1.7f;
 
     private Transform model;
@@ -34,7 +34,7 @@ public class Station : Interactable
         float dt = Time.deltaTime;
         if (fx == Fx.Steam && p > 0.3f)
         {
-            // máquina vibrando + vapor subindo
+            // machine rumbling + rising steam
             if (model != null) model.localPosition = modelBasePos + new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f)) * 0.006f;
             emitAccum += dt * 16f;
             while (emitAccum >= 1f)
@@ -46,7 +46,7 @@ public class Station : Interactable
         }
         else if (fx == Fx.Stardust)
         {
-            // moedor tremendo no ritmo da manivela + poeira estelar brilhando
+            // grinder shaking with the crank + sparkling stardust
             if (model != null) model.localRotation = modelBaseRot * Quaternion.Euler(0f, Mathf.Sin(p * Mathf.PI * 2f * 5f) * 4f, 0f);
             emitAccum += dt * 22f;
             while (emitAccum >= 1f)

@@ -1,7 +1,7 @@
 using UnityEngine;
 
-// Cliente curtindo o lo-fi: balança no ritmo (squash & stretch), inclina de um lado pro outro
-// e de vez em quando dá um pulinho feliz. Pivô do modelo deve estar nos pés.
+// A customer vibing to the lo-fi: bounces on the beat (squash & stretch), sways side to side
+// and does a happy hop now and then. The model pivot must be at the feet.
 public class AlienGroove : MonoBehaviour
 {
     public float bpm = 78f;
@@ -29,7 +29,7 @@ public class AlienGroove : MonoBehaviour
         baseRot = transform.localRotation;
     }
 
-    // pulinho feliz agora (ex.: depois do gole)
+    // happy hop right now (e.g. after a sip)
     public void TriggerHop()
     {
         hopStart = Time.time;
@@ -38,19 +38,19 @@ public class AlienGroove : MonoBehaviour
 
     void Update()
     {
-        // pulinho feliz
+        // happy hop
         if (Time.time > nextHop) { hopStart = Time.time; nextHop = Time.time + HopDuration + Random.Range(hopInterval.x, hopInterval.y); }
         float h = (Time.time - hopStart) / HopDuration;
         float hop = (h >= 0f && h <= 1f) ? Mathf.Sin(h * Mathf.PI) : 0f;
         ApplyPose(Time.time + timeOffset, hop);
     }
 
-    // Pose determinística (também usada para pré-visualizar no editor)
+    // Deterministic pose (also used for editor previews)
     public void ApplyPose(float t, float hop)
     {
         float beat = t * bpm / 60f;
 
-        // pulso no tempo: afunda rápido e volta suave
+        // pulse on the beat: quick squash, smooth recovery
         float frac = beat - Mathf.Floor(beat);
         float pulse = Mathf.Exp(-frac * 6f);
 
@@ -59,7 +59,7 @@ public class AlienGroove : MonoBehaviour
         transform.localScale = new Vector3(baseScale.x * sxz, baseScale.y * sy, baseScale.z * sxz);
         transform.localPosition = basePos + Vector3.up * hop * hopHeight;
 
-        // inclina alternando a cada batida (esquerda / direita)
+        // lean alternates every beat (left / right)
         float sway = Mathf.Sin(beat * Mathf.PI) * swayAngle;
         float nod = pulse * 3f;
         transform.localRotation = baseRot * Quaternion.Euler(nod, 0f, sway);

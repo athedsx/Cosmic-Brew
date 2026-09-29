@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Mostra o aviso do objeto interagível mais próximo e executa a ação com E (ou Espaço)
+// Shows the prompt for the nearest interactable and performs the action with E (or Space)
 [RequireComponent(typeof(PlayerCarry))]
 public class PlayerInteractor : MonoBehaviour
 {
-    [Tooltip("Aperto simulado de E (para testes automáticos)")]
+    [Tooltip("Simulated E press (for automated tests)")]
     public bool simulatePress;
 
     private PlayerCarry carry;
@@ -28,7 +28,7 @@ public class PlayerInteractor : MonoBehaviour
     {
         var ui = GameUI.Instance;
 
-        // fazendo alguma coisa: fica parado, virado para o objeto, com barra de progresso
+        // busy: stay in place facing the object, with a progress bar
         if (working != null)
         {
             workTime += Time.deltaTime;
@@ -50,7 +50,7 @@ public class PlayerInteractor : MonoBehaviour
             return;
         }
 
-        // escolhe o interagível mais próximo que tem algo a dizer
+        // pick the nearest interactable that has something to say
         Interactable best = null;
         string bestText = null;
         bool bestEnabled = false;

@@ -1,7 +1,7 @@
 using UnityEngine;
 
-// Configurações do jogador (volume, vídeo). Ficam no PlayerPrefs, separadas do save do jogo,
-// então "Novo Jogo" não apaga as opções.
+// Player settings (volume, video). Stored in PlayerPrefs, separate from the game save,
+// so "New Game" keeps the options.
 public static class GameSettings
 {
     const string P = "cosmicbrew.";
@@ -13,7 +13,7 @@ public static class GameSettings
     public static float Ambience = 0.8f;
     public static bool Fullscreen = true;
     public static int ResolutionWidth, ResolutionHeight;
-    public static int Quality = 2;     // 0 baixa, 1 média, 2 alta
+    public static int Quality = 2;     // 0 low, 1 medium, 2 high
     public static bool VSync = true;
 
     static bool loaded;
@@ -49,7 +49,7 @@ public static class GameSettings
         PlayerPrefs.Save();
     }
 
-    // Aplica vídeo (o áudio é lido direto pelo AudioManager)
+    // Applies video settings (audio is read directly by AudioManager)
     public static void ApplyVideo()
     {
         AudioListener.volume = Master;

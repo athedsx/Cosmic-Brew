@@ -1,7 +1,7 @@
 using UnityEngine;
 
-// Ferramenta de teste: faz o Ro percorrer uma rota e registra no console onde ele trava.
-// Adicionada só durante testes (não fica na cena).
+// Test tool: walks Ro along a route and logs where he gets stuck.
+// Added only during tests (not kept in the scene).
 public class WalkAutopilot : MonoBehaviour
 {
     public Vector3[] waypoints;
@@ -19,7 +19,7 @@ public class WalkAutopilot : MonoBehaviour
         move = GetComponent<RobotMovement>();
         rb = GetComponent<Rigidbody>();
         startTime = Time.time;
-        Debug.Log($"[Autopilot] inicio pos={transform.position:F2}");
+        Debug.Log($"[Autopilot] start pos={transform.position:F2}");
     }
 
     void Update()
@@ -30,9 +30,9 @@ public class WalkAutopilot : MonoBehaviour
         Vector3 to = waypoints[index] - transform.position; to.y = 0f;
         if (to.magnitude < reachRadius)
         {
-            Debug.Log($"[Autopilot] ponto {index} ok t={Time.time - startTime:F1}s");
+            Debug.Log($"[Autopilot] waypoint {index} ok t={Time.time - startTime:F1}s");
             index++;
-            if (index >= waypoints.Length) { index = 0; lap++; if (lap >= laps) Debug.Log($"[Autopilot] FIM travadas={stuckEvents} tempo={Time.time - startTime:F1}s"); }
+            if (index >= waypoints.Length) { index = 0; lap++; if (lap >= laps) Debug.Log($"[Autopilot] DONE stuck={stuckEvents} time={Time.time - startTime:F1}s"); }
             return;
         }
         move.simulatedWorldDirection = to.normalized;
@@ -42,7 +42,7 @@ public class WalkAutopilot : MonoBehaviour
         if (stuckTime > 0.6f)
         {
             stuckEvents++;
-            Debug.LogWarning($"[Autopilot] TRAVOU indo ao ponto {index} em pos={transform.position:F2}");
+            Debug.LogWarning($"[Autopilot] STUCK heading to waypoint {index} at pos={transform.position:F2}");
             stuckTime = -2f;
         }
     }

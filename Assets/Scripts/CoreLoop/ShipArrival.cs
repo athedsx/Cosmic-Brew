@@ -1,7 +1,7 @@
 using UnityEngine;
 
-// Navezinha do cliente: vem do espaço, estaciona flutuando do lado de fora da borda da ilha,
-// o cliente desce, e quando ele volta a nave vai embora.
+// Customer shuttle: flies in from space and hovers just outside the island edge;
+// the customer steps off, and when they come back the ship leaves.
 public class ShipArrival : MonoBehaviour
 {
     public enum State { FlyingIn, Parked, FlyingOut }
@@ -23,7 +23,7 @@ public class ShipArrival : MonoBehaviour
         parkPos = park;
         outward.y = 0f;
         outward = outward.sqrMagnitude > 0.001f ? outward.normalized : Vector3.back;
-        // chega de longe, de lado e de cima (curva suave), e sai para o outro lado
+        // arrives from far away, from the side and above (smooth curve), and leaves the other way
         Vector3 side = Vector3.Cross(Vector3.up, outward);
         startPos = park + outward * 26f + side * 14f + Vector3.up * 7f;
         endPos = park + outward * 26f - side * 14f + Vector3.up * 9f;
@@ -58,7 +58,7 @@ public class ShipArrival : MonoBehaviour
             case State.FlyingIn:
             {
                 float u = Mathf.Clamp01(t / flyTime);
-                float e = 1f - (1f - u) * (1f - u); // desacelera ao estacionar
+                float e = 1f - (1f - u) * (1f - u); // eases out while parking
                 Vector3 mid = parkPos + (startPos - parkPos) * 0.35f + Vector3.up * 1.5f;
                 transform.position = Bezier(startPos, mid, parkPos, e);
                 Face(transform.position - prev, dt, e);
@@ -71,7 +71,7 @@ public class ShipArrival : MonoBehaviour
             case State.FlyingOut:
             {
                 float u = Mathf.Clamp01(t / flyTime);
-                float e = u * u; // acelera ao sair
+                float e = u * u; // eases in when leaving
                 Vector3 mid = parkPos + Vector3.up * 2f + (endPos - parkPos) * 0.2f;
                 transform.position = Bezier(parkPos, mid, endPos, e);
                 Face(transform.position - prev, dt, 1f);

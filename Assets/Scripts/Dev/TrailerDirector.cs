@@ -3,10 +3,10 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
-// Grava o trailer do jogo: roteiro de câmera + jogo sendo jogado sozinho, renderizado em 1920x1080
-// (independente do tamanho da janela) e salvo quadro a quadro em JPG. O vídeo é montado depois
-// com Tools/trailer/make_trailer.py (ffmpeg + música lo-fi).
-// Uso (em Play): new GameObject("Trailer").AddComponent<TrailerDirector>().outDir = "...";
+// Records the game trailer: scripted camera + self-playing gameplay, rendered at 1920x1080
+// (independent of the window size) and saved frame by frame as JPG. The video is assembled afterwards
+// with Tools/trailer/make_trailer.py (ffmpeg + lo-fi music).
+// Usage (in Play mode): new GameObject("Trailer").AddComponent<TrailerDirector>().outDir = "...";
 public class TrailerDirector : MonoBehaviour
 {
     public string outDir = "Trailer/frames";
@@ -37,13 +37,13 @@ public class TrailerDirector : MonoBehaviour
     private BuildMode build;
     private Lang oldLang;
 
-    // ------------------------------------------------------------------ preparação
+    // ------------------------------------------------------------------ setup
     IEnumerator Start()
     {
         Directory.CreateDirectory(outDir);
         foreach (var f in Directory.GetFiles(outDir, "*.jpg")) File.Delete(f);
 
-        // o trailer não mexe no save do jogador
+        // the trailer never touches the player's save
         var save = FindAnyObjectByType<SaveSystem>();
         if (save != null) Destroy(save);
 
@@ -69,7 +69,7 @@ public class TrailerDirector : MonoBehaviour
         cam.targetTexture = rt;
         grab = new Texture2D(width, height, TextureFormat.RGB24, false);
 
-        // a UI do jogo passa a ser desenhada pela câmera (entra na textura do trailer)
+        // the game UI is now drawn by the camera (so it lands in the trailer texture)
         var gameCanvas = GameUI.Instance.Canvas;
         gameCanvas.renderMode = RenderMode.ScreenSpaceCamera;
         gameCanvas.worldCamera = cam;
@@ -87,7 +87,7 @@ public class TrailerDirector : MonoBehaviour
         Loc.Set(oldLang);
         Cursor.visible = true;
         Done = true;
-        Debug.Log($"[Trailer] {frame} quadros em {outDir}");
+        Debug.Log($"[Trailer] {frame} frames in {outDir}");
     }
 
     IEnumerator Capture()
@@ -106,10 +106,10 @@ public class TrailerDirector : MonoBehaviour
         }
     }
 
-    // ------------------------------------------------------------------ roteiro
+    // ------------------------------------------------------------------ script
     IEnumerator Script()
     {
-        // aquecimento (não gravado): já chegam alguns clientes
+        // warm-up (not recorded): a few customers arrive
         CoinWallet.Set(34);
         spawner.spawnInterval = new Vector2(3f, 6f);
         spawner.ArriveNow();
@@ -118,7 +118,7 @@ public class TrailerDirector : MonoBehaviour
         yield return Wait(6f);
         fadeGroup.alpha = 1f;
 
-        // 1 · título: a ilha flutuando no espaço
+        // 1 · title: the island floating in space
         recording = true;
         Hud(false);
         StartCoroutine(Fade(fadeGroup, 1f, 0f, 1.2f));
@@ -126,13 +126,13 @@ public class TrailerDirector : MonoBehaviour
         yield return Orbit(new Vector3(0f, 0.3f, 0.6f), 10.5f, 8.6f, 22f, 10f, 42f, 6.5f);
         Hud(true);
 
-        // 2 · uma nave chega e o viajante desce
+        // 2 · a ship arrives and the traveler steps off
         var ship = spawner.ArriveNow();
         StartCoroutine(Caption(Loc.Get("trailer.cap_travelers"), 0.3f, 6.2f));
         if (ship != null) yield return FollowShip(ship, 7f);
         else yield return Orbit(new Vector3(0f, 0.3f, -3f), 5f, 4.5f, 28f, 30f, 50f, 5f);
 
-        // 3 · o Ro prepara o pedido com calma, sem cronômetro
+        // 3 · Ro prepares the order calmly, no timer
         follow.enabled = true;
         var customer = PickCustomer();
         StartCoroutine(Caption(Loc.Get("trailer.cap_brew"), 0.4f, 5.5f));
@@ -150,14 +150,14 @@ public class TrailerDirector : MonoBehaviour
             interactor.simulatePress = true;
             yield return Wait(0.9f);
 
-            // 4 · close no "Ahhh…" e nas moedas
+            // 4 · close-up on the "Ahhh…" and the coins
             follow.enabled = false;
             StartCoroutine(Caption(Loc.Get("trailer.cap_tips"), 0.2f, 3.4f));
             yield return Hold(customer.transform, 2.6f, 2.3f, 26f, 3.8f);
             follow.enabled = true;
         }
 
-        // 5 · Modo Construção: comprar, posicionar e pintar
+        // 5 · Build Mode: buy, place and paint
         CoinWallet.Set(260);
         build.Enter();
         StartCoroutine(Caption(Loc.Get("trailer.cap_build"), 0.9f, 10.5f, 360f));
@@ -187,7 +187,7 @@ public class TrailerDirector : MonoBehaviour
         yield return Wait(1.2f);
         build.Exit();
 
-        // 6 · encerramento
+        // 6 · closing shot
         follow.enabled = false;
         spawner.ArriveNow();
         Hud(false);
@@ -196,14 +196,14 @@ public class TrailerDirector : MonoBehaviour
         yield return Orbit(new Vector3(0f, 0.3f, 0.6f), 8f, 9.6f, 24f, 200f, 232f, 7f);
     }
 
-    // cenas de título: sem HUD, balões nem dicas
+    // title shots: no HUD, bubbles or hints
     void Hud(bool visible)
     {
         GameUI.Instance.SetHudVisible(visible);
         GameUI.Instance.SetHintVisible(false);
     }
 
-    // ------------------------------------------------------------------ ações do roteiro
+    // ------------------------------------------------------------------ scripted actions
     Customer PickCustomer()
     {
         Customer best = null;
@@ -251,7 +251,7 @@ public class TrailerDirector : MonoBehaviour
         var item = build.FindTemplate(id);
         if (item == null) yield break;
         build.ScriptBuy(item);
-        // acha um lugar livre perto do ângulo pedido
+        // find a free spot near the requested angle
         Vector3 spot = Vector3.zero;
         bool found = false;
         for (int k = 0; k < 24 && !found; k++)
@@ -263,7 +263,7 @@ public class TrailerDirector : MonoBehaviour
                 if (build.GhostValid) { spot = p; found = true; }
             }
         if (!found) { build.ScriptCancel(); yield break; }
-        // o fantasma desliza até o lugar, gira e é colocado
+        // the ghost glides to the spot, rotates and gets placed
         float dur = 1.3f, t = 0f;
         while (t < dur)
         {
@@ -278,7 +278,7 @@ public class TrailerDirector : MonoBehaviour
         yield return Wait(0.6f);
     }
 
-    // ------------------------------------------------------------------ câmera
+    // ------------------------------------------------------------------ camera
     void SetCam(Vector3 focus, float size, float pitch, float yaw)
     {
         var rot = Quaternion.Euler(pitch, yaw, 0f);
@@ -303,7 +303,7 @@ public class TrailerDirector : MonoBehaviour
     IEnumerator FollowShip(ShipArrival ship, float dur)
     {
         follow.enabled = false;
-        // câmera do lado de fora, olhando para a ilha: a nave entra no quadro e estaciona
+        // camera outside, looking at the island: the ship enters the frame and parks
         Vector3 park = ship.ParkPosition;
         Vector3 outward = park; outward.y = 0f;
         float yaw = Mathf.Atan2(-outward.x, -outward.z) * Mathf.Rad2Deg + 28f;
@@ -335,7 +335,7 @@ public class TrailerDirector : MonoBehaviour
         }
     }
 
-    // ------------------------------------------------------------------ letreiros
+    // ------------------------------------------------------------------ titles
     void BuildOverlay()
     {
         var go = new GameObject("TrailerOverlay", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
@@ -350,13 +350,13 @@ public class TrailerDirector : MonoBehaviour
         scaler.referenceResolution = new Vector2(1920, 1080);
         var root = (RectTransform)go.transform;
 
-        // título central
+        // centered title
         var title = Group("Titulo", root, out titleGroup);
         titleText = Label(title, "Cosmic Brew", 150, Gold, new Vector2(0f, 60f), new Vector2(1600f, 190f));
         subText = Label(title, "", 44, Cream, new Vector2(0f, -70f), new Vector2(1600f, 70f));
         titleGroup.alpha = 0f;
 
-        // legenda embaixo
+        // caption at the bottom
         var cap = Group("Legenda", root, out captionGroup);
         captionPanel = new GameObject("Fundo", typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
         captionPanel.SetParent(cap, false);
@@ -370,7 +370,7 @@ public class TrailerDirector : MonoBehaviour
         captionText.rectTransform.anchorMin = captionText.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
         captionGroup.alpha = 0f;
 
-        // preto para abrir e fechar
+        // black for fade in/out
         var fade = Group("Fade", root, out fadeGroup);
         var black = fade.gameObject.AddComponent<Image>();
         black.color = new Color(0.06f, 0.04f, 0.1f, 1f);

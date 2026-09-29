@@ -1,4 +1,4 @@
-// Skybox do Cosmic Brew: gradiente pastel (roxo -> azul marinho -> rosa) com estrelas piscando
+// Cosmic Brew skybox: pastel gradient (purple -> navy -> pink) with twinkling stars
 Shader "Cosmic/SpaceSky"
 {
     Properties
@@ -55,13 +55,13 @@ Shader "Cosmic/SpaceSky"
             {
                 float3 d = normalize(i.dir);
 
-                // Gradiente vertical suave
+                // Smooth vertical gradient
                 float h = d.y;
                 half3 col = h > 0
                     ? lerp(_MidColor.rgb, _TopColor.rgb, smoothstep(0.0, 0.8, h))
                     : lerp(_MidColor.rgb, _BottomColor.rgb, smoothstep(0.0, 0.7, -h));
 
-                // Estrelas procedurais em células 3D
+                // Procedural stars in 3D cells
                 float3 p = d * _StarDensity;
                 float3 cell = floor(p);
                 float3 f = frac(p) - 0.5;

@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// A xícara que o Ro carrega: ingredientes + visual 3D na frente dele
+// The cup Ro carries: ingredients + a 3D mug in front of him
 public class PlayerCarry : MonoBehaviour
 {
     public const int MaxIngredients = 3;
 
-    [Tooltip("Posição da xícara em relação ao Ro (entre as mãos)")]
+    [Tooltip("Cup position relative to Ro (between the hands)")]
     public Vector3 mugOffset = new Vector3(0f, 0.86f, 0.5f);
 
     private readonly List<Ingredient> cup = new List<Ingredient>();
@@ -24,7 +24,7 @@ public class PlayerCarry : MonoBehaviour
     public Color LiquidColor => liquidMat != null ? liquidMat.color : Color.white;
     public bool LiquidGlows { get { foreach (var i in cup) if (i == Ingredient.PoeiraEstelar) return true; return false; } }
 
-    // A animação atual (o PlayerInteractor avisa a cada quadro)
+    // Current animation (PlayerInteractor reports it every frame)
     public void SetAction(RoAction action, float progress, Vector3 handoffPoint)
     {
         curAction = action;
@@ -34,7 +34,7 @@ public class PlayerCarry : MonoBehaviour
 
     static float Ease(float x) => Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(x));
 
-    // Xícara acompanhando a ação: despejar na lixeira, voar até o cliente ao servir
+    // Cup following the action: pouring into the bin, flying to the customer when serving
     void LateUpdate()
     {
         if (mug == null || !mug.activeSelf) return;

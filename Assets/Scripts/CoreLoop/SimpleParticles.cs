@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Partículas simples e leves (quads virados para a câmera): vapor, brilhos, nuvenzinhas.
-// Criado sob demanda; não precisa estar na cena.
+// Simple, lightweight particles (camera-facing quads): steam, sparkles, little clouds.
+// Created on demand; does not need to be in the scene.
 public class SimpleParticles : MonoBehaviour
 {
     public enum Shape { Soft, Star, Circle }
@@ -53,7 +53,7 @@ public class SimpleParticles : MonoBehaviour
         return m;
     }
 
-    // Emite 'count' partículas
+    // Emits 'count' particles
     public void Emit(Vector3 pos, int count, Shape shape, Color color, float size, float life,
                      Vector3 baseVelocity, float spread, float gravity = 0f, float grow = 0f, float drag = 0f)
     {

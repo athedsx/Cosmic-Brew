@@ -5,19 +5,19 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
-// Modo Construção (B): catálogo de decorações pagas com Moedas Estelares,
-// posicionamento em grid com pré-visualização (verde = pode, vermelho = não pode).
-// Tudo por clique: clique num objeto da ilha para selecionar. Decorações podem ser
-// movidas, giradas, pintadas e guardadas; deck, borda e quiosque podem ser pintados.
+// Build Mode (B): a catalog of decorations bought with Star Coins,
+// grid placement with a preview ghost (green = allowed, red = blocked).
+// Everything is click-driven: click an object on the island to select it. Decorations can be
+// moved, rotated, painted and stored; the deck, rim and kiosk can be painted.
 public class BuildMode : MonoBehaviour
 {
     public static BuildMode Instance { get; private set; }
     public static bool IsActive => Instance != null && Instance.active;
-    // quadro em que o Esc fechou algo aqui (a pausa ignora esse Esc)
+    // frame in which Esc closed something here (the pause menu ignores that Esc)
     public static int LastEscFrame { get; private set; } = -1;
 
-    [Header("Catálogo")]
-    [Tooltip("Modelos das decorações (ficam desativados; são clonados ao comprar)")]
+    [Header("Catalog")]
+    [Tooltip("Decoration templates (kept disabled; cloned on purchase)")]
     public Decoration[] catalog;
     public Transform decorationsParent;
     public CustomerSpawner spawner;
@@ -25,12 +25,12 @@ public class BuildMode : MonoBehaviour
     [Header("Grid")]
     public float cellSize = 1f;
     public Vector3 islandCenter = Vector3.zero;
-    [Tooltip("Raio útil da ilha para colocar coisas")]
+    [Tooltip("Usable island radius for placing items")]
     public float islandRadius = 7.1f;
-    [Tooltip("Colisores ignorados na checagem de espaço (chão, limites)")]
+    [Tooltip("Colliders ignored by the free-space check (floor, bounds)")]
     public Transform[] ignoreForOverlap;
     public int thumbnailLayer = 30;
-    [Tooltip("Preço de pintar uma decoração (usa o da ilha se houver IslandColors)")]
+    [Tooltip("Cost of painting a decoration (uses the island cost when IslandColors exists)")]
     public int decorationColorCost = 5;
 
     static readonly Color Night = new Color(0.16f, 0.12f, 0.27f, 0.92f);
@@ -42,8 +42,8 @@ public class BuildMode : MonoBehaviour
     static readonly Color Lilac = new Color(0.8f, 0.74f, 0.95f);
 
     private bool active;
-    private Decoration placingTemplate;      // item novo sendo comprado
-    private Decoration moving;               // item existente sendo movido
+    private Decoration placingTemplate;      // new item being bought
+    private Decoration moving;               // existing item being moved
     private Vector3 movingOrigPos;
     private Quaternion movingOrigRot;
     private GameObject ghost;
@@ -55,13 +55,13 @@ public class BuildMode : MonoBehaviour
     private string messageText;
     private float messageUntil;
 
-    // seleção: uma decoração OU uma parte da ilha (índice em IslandColors.targets)
+    // selection: either a decoration OR an island part (index into IslandColors.targets)
     private Decoration selectedDeco;
     private int selectedPart = -1;
     private Transform selRing, hoverRing;
     private Material selRingMat, hoverRingMat;
 
-    // área reservada aos clientes: onde esperam + caminho até a borda (faixas rosa)
+    // area reserved for customers: where they wait + their path to the edge (pink strips)
     struct Zone { public Vector3 a, b; }
     private readonly List<Zone> zones = new List<Zone>();
     private readonly List<GameObject> zoneVisuals = new List<GameObject>();
@@ -73,7 +73,7 @@ public class BuildMode : MonoBehaviour
     private Text bannerText;
     private readonly List<Card> cards = new List<Card>();
 
-    // painel da seleção (lado direito)
+    // selection panel (right side)
     private RectTransform selPanel, swatchBox, actionRow;
     private Text selTitle, selColorLabel, selCurrent;
     private Text storeLabel;
@@ -156,7 +156,7 @@ public class BuildMode : MonoBehaviour
 
         RefreshCards();
         RefreshSelection();
-        if (scripted) return; // trailer: quem controla é o roteiro, não o mouse
+        if (scripted) return; // trailer: the script drives Build Mode, not the mouse
         bool overUI =EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
         Vector3? ground = MouseOnGround(mouse);
 
@@ -183,7 +183,7 @@ public class BuildMode : MonoBehaviour
             return;
         }
 
-        // atalhos da decoração selecionada
+        // shortcuts for the selected decoration
         if (selectedDeco != null)
         {
             if (kb.rKey.wasPressedThisFrame) RotateSelected();
@@ -215,7 +215,7 @@ public class BuildMode : MonoBehaviour
         else SetBanner(Loc.Get("build.default"));
     }
 
-    // ------------------------------------------------------------------ roteiro do trailer
+    // ------------------------------------------------------------------ trailer scripting
     [System.NonSerialized] public bool scripted;
     public bool GhostValid => ghost != null && ghostValid;
     public void ScriptBuy(Decoration item) => Select(item);
@@ -254,7 +254,7 @@ public class BuildMode : MonoBehaviour
         return null;
     }
 
-    // ------------------------------------------------------------------ entrar / sair
+    // ------------------------------------------------------------------ enter / exit
     public void Enter()
     {
         active = true;
@@ -263,7 +263,7 @@ public class BuildMode : MonoBehaviour
         if (roInteract != null) roInteract.enabled = false;
         if (GameUI.Instance != null) GameUI.Instance.SetBuildHud(true);
         if (camFollow != null) camFollow.buildView = true;
-        // clientes somem enquanto constrói (e não chega ninguém novo)
+        // customers hide while building (and nobody new arrives)
         if (spawner != null) spawner.paused = true;
         hiddenCustomers.Clear();
         foreach (var c in FindObjectsByType<Customer>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
@@ -301,7 +301,7 @@ public class BuildMode : MonoBehaviour
         if (!v) { ShowRing(selRing, null); ShowRing(hoverRing, null); }
     }
 
-    // ------------------------------------------------------------------ seleção
+    // ------------------------------------------------------------------ selection
     void Pick(Mouse mouse, out Decoration deco, out int part)
     {
         deco = null;
@@ -350,7 +350,7 @@ public class BuildMode : MonoBehaviour
     {
         if (selectedDeco == null) return;
         if (selectedDeco.isSeat && spawner != null && spawner.IsSeatOccupied(selectedDeco.transform)) { Message(Loc.Get("build.occupied")); return; }
-        // o espaço ocupado é um círculo: girar no lugar sempre cabe
+        // the footprint is a circle, so rotating in place always fits
         selectedDeco.transform.rotation = Quaternion.Euler(0f, (selectedDeco.transform.eulerAngles.y + 90f) % 360f, 0f);
         if (AudioManager.Instance != null) AudioManager.Instance.Play("place", selectedDeco.transform.position);
         Physics.SyncTransforms();
@@ -406,7 +406,7 @@ public class BuildMode : MonoBehaviour
         selectedDeco != null ? selectedDeco.ColorIndex
         : selectedPart >= 0 ? IslandColors.Instance.targets[selectedPart].current : -1;
 
-    // ------------------------------------------------------------------ colocar / mover / guardar
+    // ------------------------------------------------------------------ place / move / store
     void Select(Decoration item)
     {
         if (item == null) return;
@@ -448,7 +448,7 @@ public class BuildMode : MonoBehaviour
             Physics.SyncTransforms();
             RebuildZones();
             if (SaveSystem.Instance != null) SaveSystem.Instance.MarkDirty();
-            SelectDecoration(moved); // continua selecionado no lugar novo
+            SelectDecoration(moved); // stays selected at its new spot
             return;
         }
         var item = placingTemplate;
@@ -466,7 +466,7 @@ public class BuildMode : MonoBehaviour
         Physics.SyncTransforms();
         RebuildZones();
         if (SaveSystem.Instance != null) SaveSystem.Instance.MarkDirty();
-        if (CoinWallet.Coins < item.price) CancelPlacing(); // acabou o dinheiro: para de colocar
+        if (CoinWallet.Coins < item.price) CancelPlacing(); // out of coins: stop placing
     }
 
     bool Store(Decoration d)
@@ -475,7 +475,7 @@ public class BuildMode : MonoBehaviour
         CoinWallet.Add(d.price);
         if (AudioManager.Instance != null) AudioManager.Instance.Play("store", d.transform.position);
         if (GameUI.Instance != null) GameUI.Instance.ShowPopup(d.transform.position + Vector3.up * 1.6f, Loc.Get("build.stored", d.price), Gold);
-        d.gameObject.SetActive(false); // some já (Destroy só acontece no fim do frame)
+        d.gameObject.SetActive(false); // hide now (Destroy only happens at the end of the frame)
         Destroy(d.gameObject);
         RebuildZones();
         if (SaveSystem.Instance != null) SaveSystem.Instance.MarkDirty();
@@ -526,7 +526,7 @@ public class BuildMode : MonoBehaviour
         ghost = null;
     }
 
-    // ------------------------------------------------------------------ anéis de destaque
+    // ------------------------------------------------------------------ highlight rings
     void BuildRings(Shader sprite)
     {
         const int size = 128;
@@ -575,7 +575,7 @@ public class BuildMode : MonoBehaviour
         ring.gameObject.SetActive(true);
     }
 
-    // ------------------------------------------------------------------ regras do grid
+    // ------------------------------------------------------------------ grid rules
     Vector3 Snap(Vector3 p) =>
         new Vector3((Mathf.Floor(p.x / cellSize) + 0.5f) * cellSize, 0f, (Mathf.Floor(p.z / cellSize) + 0.5f) * cellSize);
 
@@ -593,10 +593,10 @@ public class BuildMode : MonoBehaviour
             if (IsIgnored(h.transform)) continue;
             return false;
         }
-        // não pode ficar onde os clientes esperam nem no caminho deles
+        // cannot block where customers wait or their path
         foreach (var z in zones)
             if (DistanceToSegment(pos, z.a, z.b) < item.footprint + ZoneHalfWidth) return false;
-        // banquinho novo: o caminho dos clientes até ele precisa estar livre
+        // new stool: the customer path to it must be clear
         if (item.isSeat && spawner != null)
         {
             spawner.GetCustomerPath(pos, out Vector3 stand, out Vector3 entry);
@@ -620,7 +620,7 @@ public class BuildMode : MonoBehaviour
         return Vector3.Distance(p, a + ab * t);
     }
 
-    // ------------------------------------------------------------------ zonas dos clientes
+    // ------------------------------------------------------------------ customer zones
     void RebuildZones()
     {
         ClearZoneVisuals();
@@ -632,7 +632,7 @@ public class BuildMode : MonoBehaviour
             spawner.GetCustomerPath(seat.position, out Vector3 stand, out Vector3 entry);
             zones.Add(new Zone { a = stand, b = entry });
             if (!active) continue;
-            // faixa rosa do lugar de espera até a borda
+            // pink strip from the waiting spot to the edge
             Vector3 dir = entry - stand; dir.y = 0f;
             float len = dir.magnitude;
             var strip = GameObject.CreatePrimitive(PrimitiveType.Quad);
@@ -671,7 +671,7 @@ public class BuildMode : MonoBehaviour
         return plane.Raycast(ray, out float enter) ? ray.GetPoint(enter) : (Vector3?)null;
     }
 
-    // ------------------------------------------------------------------ grid visual
+    // ------------------------------------------------------------------ grid visuals
     void BuildGrid()
     {
         const int size = 1024;
@@ -727,7 +727,7 @@ public class BuildMode : MonoBehaviour
         float width = catalog.Length * (cardW + gap) + gap + 8f;
         catalogPanel = ui.Panel("Catalogo", ui.Root, UISprites.Rounded, Night, new Vector2(width, cardH + 56f));
         GameUI.Anchor(catalogPanel, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 22f));
-        catalogPanel.GetComponent<Image>().raycastTarget = true; // clique no painel não passa para a ilha
+        catalogPanel.GetComponent<Image>().raycastTarget = true; // clicks on the panel do not reach the island
         var title = ui.Label("Titulo", catalogPanel, "", 20, Gold, TextAnchor.UpperLeft);
         ui.Bind(title, () => Loc.Get("build.catalog"));
         title.rectTransform.sizeDelta = new Vector2(500, 30);
@@ -777,7 +777,7 @@ public class BuildMode : MonoBehaviour
         BuildSelectionPanel(ui);
     }
 
-    // Painel à direita: nome do objeto clicado, cores e ações
+    // Right-hand panel: clicked object's name, colors and actions
     void BuildSelectionPanel(GameUI ui)
     {
         selPanel = ui.Panel("Selecao", ui.Root, UISprites.Rounded, Night, new Vector2(372, 320));
@@ -838,7 +838,7 @@ public class BuildMode : MonoBehaviour
         return b;
     }
 
-    // Recria as bolinhas de cor para o objeto selecionado
+    // Rebuilds the color swatches for the selected object
     void OpenSelectionPanel()
     {
         var ui = GameUI.Instance;
@@ -863,7 +863,7 @@ public class BuildMode : MonoBehaviour
             dot.GetComponent<Image>().raycastTarget = true;
             if (s == 0)
             {
-                // a cor original leva uma estrelinha
+                // the original color gets a little star
                 var mark = ui.Panel("Original", dot, UISprites.Star, new Color(0.5f, 0.4f, 0.65f, 0.8f), new Vector2(20, 20));
                 GameUI.Anchor(mark, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero);
             }
@@ -893,7 +893,7 @@ public class BuildMode : MonoBehaviour
     {
         if (selPanel == null) return;
         if (selectedDeco == null && selectedPart < 0) { ShowRing(selRing, null); return; }
-        if ((object)selectedDeco != null && !selectedDeco) { Deselect(); return; } // destruído
+        if ((object)selectedDeco != null && !selectedDeco) { Deselect(); return; } // destroyed
         bool panelVisible = ghost == null;
         if (selPanel.gameObject.activeSelf != panelVisible) selPanel.gameObject.SetActive(panelVisible);
 
@@ -936,7 +936,7 @@ public class BuildMode : MonoBehaviour
         messageUntil = Time.time + 2.2f;
     }
 
-    // Renderiza uma miniatura 3D do item (uma vez, ao montar o catálogo)
+    // Renders a 3D thumbnail of the item (once, when building the catalog)
     Texture RenderThumbnail(Decoration item)
     {
         const int size = 192;

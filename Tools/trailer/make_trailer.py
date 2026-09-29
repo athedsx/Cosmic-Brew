@@ -1,6 +1,6 @@
-# Monta o trailer: quadros JPG do TrailerDirector + música lo-fi do jogo -> MP4 (H.264 + AAC).
-# Uso: python Tools/trailer/make_trailer.py [pasta_quadros] [saida.mp4]
-# Precisa do ffmpeg portátil: pip install imageio-ffmpeg
+# Assembles the trailer: TrailerDirector JPG frames + the game's lo-fi music -> MP4 (H.264 + AAC).
+# Usage: python Tools/trailer/make_trailer.py [frames_dir] [output.mp4]
+# Requires a portable ffmpeg: pip install imageio-ffmpeg
 import os, subprocess, sys
 import imageio_ffmpeg
 
@@ -24,6 +24,6 @@ cmd = [
     "-c:v", "libx264", "-preset", "slow", "-crf", "18", "-pix_fmt", "yuv420p", "-movflags", "+faststart",
     "-c:a", "aac", "-b:a", "192k", "-shortest", out,
 ]
-print(f"{count} quadros ({dur:.1f} s) -> {out}")
+print(f"{count} frames ({dur:.1f} s) -> {out}")
 subprocess.run(cmd, check=True)
-print("pronto:", out)
+print("done:", out)

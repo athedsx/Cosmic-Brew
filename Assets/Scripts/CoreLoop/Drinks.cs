@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Ingredientes que as estações adicionam na xícara
+// Ingredients that stations add to the cup
 public enum Ingredient { Cafe, PoeiraEstelar, LeiteNebuloso }
 
 public static class IngredientInfo
@@ -14,7 +14,7 @@ public static class IngredientInfo
         _ => i.ToString()
     };
 
-    // cor do líquido na xícara 3D
+    // liquid color in the 3D cup
     public static Color LiquidColor(Ingredient i) => i switch
     {
         Ingredient.Cafe => new Color(0.42f, 0.24f, 0.14f),
@@ -23,7 +23,7 @@ public static class IngredientInfo
         _ => Color.white
     };
 
-    // cor do texto sobre fundo escuro (HUD) e sobre fundo claro (balões)
+    // text color on dark backgrounds (HUD) and light backgrounds (bubbles)
     public static Color UiOnDark(Ingredient i) => i switch
     {
         Ingredient.Cafe => new Color(1f, 0.78f, 0.58f),
@@ -40,7 +40,7 @@ public static class IngredientInfo
         _ => Color.black
     };
 
-    // alguma estação ativa na ilha oferece este ingrediente?
+    // does any active station on the island provide this ingredient?
     public static bool Available(Ingredient i)
     {
         foreach (var it in Interactable.All)
@@ -52,14 +52,14 @@ public static class IngredientInfo
 [System.Serializable]
 public class Recipe
 {
-    [Tooltip("Chave de tradução do nome (strings.txt)")]
+    [Tooltip("Localization key for the name (strings.txt)")]
     public string key;
     public Ingredient[] ingredients;
     public int price;
 
     public string Name => Loc.Get(key);
 
-    // A ordem não importa (vibe zen): só precisa ter os mesmos ingredientes
+    // Order does not matter (zen vibe): it only needs the same ingredients
     public bool Matches(IReadOnlyList<Ingredient> cup)
     {
         if (cup == null || cup.Count != ingredients.Length) return false;
@@ -81,13 +81,13 @@ public static class RecipeBook
         new Recipe { key = "recipe.espresso", ingredients = new[] { Ingredient.Cafe }, price = 8 },
         new Recipe { key = "recipe.stellar", ingredients = new[] { Ingredient.Cafe, Ingredient.PoeiraEstelar }, price = 12 },
         new Recipe { key = "recipe.double", ingredients = new[] { Ingredient.Cafe, Ingredient.Cafe }, price = 10 },
-        // precisam do Vaporizador de Leite Nebuloso (comprado no Modo Construção)
+        // require the Nebula Milk Steamer (bought in Build Mode)
         new Recipe { key = "recipe.latte", ingredients = new[] { Ingredient.Cafe, Ingredient.LeiteNebuloso }, price = 13 },
         new Recipe { key = "recipe.cloud", ingredients = new[] { Ingredient.LeiteNebuloso, Ingredient.PoeiraEstelar }, price = 14 },
         new Recipe { key = "recipe.galaxy", ingredients = new[] { Ingredient.Cafe, Ingredient.LeiteNebuloso, Ingredient.PoeiraEstelar }, price = 20 },
     };
 
-    // só pede o que dá para fazer com as estações que existem na ilha
+    // only orders what the stations on the island can make
     public static Recipe Random()
     {
         var possible = new List<Recipe>();
@@ -108,11 +108,11 @@ public static class RecipeBook
     }
 }
 
-// Moedas Estelares do jogador
+// The player's Star Coins
 public static class CoinWallet
 {
     public static int Coins { get; private set; }
-    public static event System.Action<int, int> Changed; // (total, variação)
+    public static event System.Action<int, int> Changed; // (total, delta)
 
     public static void Add(int amount)
     {
@@ -120,7 +120,7 @@ public static class CoinWallet
         Changed?.Invoke(Coins, amount);
     }
 
-    // usado ao carregar o save
+    // used when loading the save
     public static void Set(int amount)
     {
         Coins = Mathf.Max(0, amount);

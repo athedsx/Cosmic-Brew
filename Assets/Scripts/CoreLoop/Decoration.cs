@@ -1,27 +1,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Item de decoração que pode ser comprado, colocado, movido, pintado e guardado no Modo Construção
+// Decoration that can be bought, placed, moved, painted and stored in Build Mode
 public class Decoration : MonoBehaviour
 {
-    [Tooltip("Identificador (usado no save) e nome de reserva")]
+    [Tooltip("Identifier (used in the save file) and fallback name")]
     public string displayName = "Decoração";
-    [Tooltip("Chave de tradução do nome, ex.: deco.plant")]
+    [Tooltip("Localization key for the name, e.g. deco.plant")]
     public string nameKey;
 
     public string DisplayName => Loc.KeyOr(nameKey, displayName);
-    [Tooltip("Preço no catálogo (e o valor devolvido ao guardar)")]
+    [Tooltip("Catalog price (also refunded when stored)")]
     public int price = 10;
-    [Tooltip("Raio ocupado no chão (m)")]
+    [Tooltip("Footprint radius on the floor (m)")]
     public float footprint = 0.45f;
-    [Tooltip("Clientes podem esperar aqui (banquinho)")]
+    [Tooltip("Customers can wait here (stool)")]
     public bool isSeat;
-    [Tooltip("Fica no chão e não bloqueia (ex.: tapete)")]
+    [Tooltip("Lies flat and does not block (e.g. rug)")]
     public bool isFloor;
-    [Tooltip("Partes que mudam de cor ao pintar (vazio = todas sem textura)")]
+    [Tooltip("Parts recolored when painting (empty = every untextured part)")]
     public Renderer[] colorParts;
 
-    // Paleta das decorações (a primeira é a cor original do modelo)
+    // Decoration palette (the first entry is the model's original color)
     public static readonly IslandColors.Swatch[] Palette =
     {
         new IslandColors.Swatch { name = "original", key = "color.original", color = Color.white },
@@ -51,7 +51,7 @@ public class Decoration : MonoBehaviour
         ColorIndex = index;
         foreach (var r in Parts())
         {
-            foreach (var m in r.materials) // cópias só deste item
+            foreach (var m in r.materials) // per-item material copies
             {
                 if (!m.HasProperty("_BaseColor")) continue;
                 if (!originals.TryGetValue(m, out var orig)) originals[m] = orig = m.GetColor("_BaseColor");

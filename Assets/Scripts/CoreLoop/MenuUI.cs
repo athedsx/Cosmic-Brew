@@ -6,17 +6,17 @@ using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-// Menus do jogo (uGUI por código): tela inicial, pausa (Esc), opções
-// (áudio, idioma com bandeiras, vídeo, controles) e confirmação de "Novo Jogo".
+// Game menus (uGUI built in code): title screen, pause (Esc), options
+// (audio, language with flags, video, controls) and the "New Game" confirmation.
 public class MenuUI : MonoBehaviour
 {
     public static MenuUI Instance { get; private set; }
-    // true enquanto a tela inicial ou a pausa estão abertas (bloqueia o jogo)
+    // true while the title screen or pause menu is open (blocks gameplay)
     public static bool IsBlocking => Instance != null && Instance.state != State.Playing;
 
     enum State { Title, Playing, Paused }
 
-    static bool skipTitleOnce; // "Novo Jogo" recarrega a cena direto no jogo
+    static bool skipTitleOnce; // "New Game" reloads the scene straight into gameplay
 
     static readonly Color Night = new Color(0.14f, 0.1f, 0.24f, 0.94f);
     static readonly Color Card = new Color(0.24f, 0.18f, 0.38f, 1f);
@@ -72,7 +72,7 @@ public class MenuUI : MonoBehaviour
         else ShowTitle();
     }
 
-    // ================================================================== estados
+    // ================================================================== states
     void ShowTitle()
     {
         state = State.Title;
@@ -85,7 +85,7 @@ public class MenuUI : MonoBehaviour
         Select(continueButton.gameObject.activeSelf ? continueButton : firstTitleButton);
     }
 
-    // começa a jogar sem passar pelo menu (usado pelo trailer)
+    // starts playing without the menu (used by the trailer)
     public void StartGameNow() => StartPlaying();
 
     void StartPlaying()
@@ -131,7 +131,7 @@ public class MenuUI : MonoBehaviour
     {
         var kb = Keyboard.current;
         if (kb == null || !kb.escapeKey.wasPressedThisFrame) return;
-        if (BuildMode.LastEscFrame == Time.frameCount) return; // o Esc já fechou o Modo Construção
+        if (BuildMode.LastEscFrame == Time.frameCount) return; // Esc already closed Build Mode
 
         if (confirmScreen.gameObject.activeSelf) { Show(titleScreen); return; }
         if (optionsScreen.gameObject.activeSelf) { CloseOptions(); return; }
@@ -139,7 +139,7 @@ public class MenuUI : MonoBehaviour
         else if (state == State.Paused) StartPlaying();
     }
 
-    // ================================================================== ações
+    // ================================================================== actions
     void OnContinue() { Click(); StartPlaying(); }
 
     void OnNewGame()
@@ -153,7 +153,7 @@ public class MenuUI : MonoBehaviour
     {
         Click();
         try { System.IO.File.Delete(SaveSystem.SavePath); } catch { }
-        if (SaveSystem.Instance != null) SaveSystem.Instance.enabled = false; // não salva de novo antes de recarregar
+        if (SaveSystem.Instance != null) SaveSystem.Instance.enabled = false; // do not save again before reloading
         CoinWallet.Set(0);
         skipTitleOnce = true;
         Time.timeScale = 1f;
@@ -197,7 +197,7 @@ public class MenuUI : MonoBehaviour
 
     static void Click() { if (AudioManager.Instance != null) AudioManager.Instance.Play("ui_click"); }
 
-    // ================================================================== construção da UI
+    // ================================================================== UI construction
     void Build()
     {
         var canvasGo = new GameObject("MenuCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
@@ -274,11 +274,11 @@ public class MenuUI : MonoBehaviour
         return rt;
     }
 
-    // ---------------------------------------------------------------- tela inicial
+    // ---------------------------------------------------------------- title screen
     void BuildTitle()
     {
         titleScreen = MakeScreen("TelaInicial");
-        // degradê suave à esquerda para o texto aparecer sobre a ilha
+        // soft gradient on the left so the text reads over the island
         var shade = ui.Panel("Sombra", titleScreen, null, new Color(0.08f, 0.05f, 0.16f, 0.55f), Vector2.zero);
         shade.anchorMin = Vector2.zero; shade.anchorMax = new Vector2(0.42f, 1f); shade.offsetMin = shade.offsetMax = Vector2.zero;
 
@@ -286,7 +286,7 @@ public class MenuUI : MonoBehaviour
         logo.rectTransform.sizeDelta = new Vector2(760, 150);
         GameUI.Anchor(logo.rectTransform, new Vector2(0.2f, 0.76f), new Vector2(0.5f, 0.5f), Vector2.zero);
         var shadow = logo.gameObject.AddComponent<Shadow>(); shadow.effectColor = new Color(0.35f, 0.15f, 0.4f, 0.8f); shadow.effectDistance = new Vector2(5, -6);
-        ui.FixFont(logo, Loc.FontFor(Lang.EN)); // o nome do jogo é sempre em latim
+        ui.FixFont(logo, Loc.FontFor(Lang.EN)); // the game title always uses the Latin font
         var star = ui.Panel("Estrela", titleScreen, UISprites.Star, Peach, new Vector2(60, 60));
         GameUI.Anchor(star, new Vector2(0.2f, 0.76f), new Vector2(0.5f, 0.5f), new Vector2(340, 58));
         var sub = LabelKey(titleScreen, "menu.subtitle", 30, Lilac, TextAnchor.MiddleCenter, FontStyle.Normal);
@@ -300,7 +300,7 @@ public class MenuUI : MonoBehaviour
         MakeButton(col, "menu.options", size, () => OpenOptions(false));
         MakeButton(col, "menu.quit", size, OnQuit);
 
-        // troca rápida de idioma pelas bandeirinhas
+        // quick language switch through the flags
         var flags = new GameObject("Idiomas", typeof(RectTransform), typeof(HorizontalLayoutGroup), typeof(ContentSizeFitter));
         var frt = (RectTransform)flags.transform; frt.SetParent(titleScreen, false);
         GameUI.Anchor(frt, new Vector2(0.2f, 0.08f), new Vector2(0.5f, 0.5f), Vector2.zero);
@@ -321,7 +321,7 @@ public class MenuUI : MonoBehaviour
         GameUI.Anchor(version.rectTransform, new Vector2(1, 0), new Vector2(1, 0), new Vector2(-24, 18));
     }
 
-    // ---------------------------------------------------------------- pausa
+    // ---------------------------------------------------------------- pause
     void BuildPause()
     {
         pauseScreen = MakeScreen("Pausa", Dim);
@@ -337,7 +337,7 @@ public class MenuUI : MonoBehaviour
         MakeButton(col, "pause.main_menu", size, OnMainMenu);
     }
 
-    // ---------------------------------------------------------------- confirmação
+    // ---------------------------------------------------------------- confirmation
     void BuildConfirm()
     {
         confirmScreen = MakeScreen("Confirmar", Dim);
@@ -353,7 +353,7 @@ public class MenuUI : MonoBehaviour
         GameUI.Anchor((RectTransform)no.transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(140, 34));
     }
 
-    // ---------------------------------------------------------------- opções
+    // ---------------------------------------------------------------- options
     void BuildOptions()
     {
         optionsScreen = MakeScreen("Opcoes", Dim);
@@ -477,7 +477,7 @@ public class MenuUI : MonoBehaviour
             var name = ui.Label("Nome", card, Loc.NativeNames[i], 30, Cream, TextAnchor.MiddleLeft);
             name.rectTransform.anchorMin = new Vector2(0, 0); name.rectTransform.anchorMax = new Vector2(1, 1);
             name.rectTransform.offsetMin = new Vector2(146, 0); name.rectTransform.offsetMax = new Vector2(-12, 0);
-            ui.FixFont(name, Loc.FontFor(lang)); // cada idioma escrito com a própria fonte
+            ui.FixFont(name, Loc.FontFor(lang)); // each language written with its own font
             langCards.Add((lang, img));
         }
     }
@@ -572,7 +572,7 @@ public class MenuUI : MonoBehaviour
         }
     }
 
-    // ------------------------------------------------------------------ utilidades p/ outros scripts
+    // ------------------------------------------------------------------ helpers for other scripts
     public static void SkipTitleNextLoad() => skipTitleOnce = true;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]

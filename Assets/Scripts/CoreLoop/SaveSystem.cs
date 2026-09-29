@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-// Salvamento automático: Moedas Estelares + decorações (posição e giro).
-// Salva logo depois de mudanças (moedas, colocar/mover/guardar), a cada 30 s e ao fechar o jogo.
+// Autosave: Star Coins + decorations (position, rotation and color).
+// Saves shortly after changes (coins, place/move/store), every 30 s and on quit.
 public class SaveSystem : MonoBehaviour
 {
     public static SaveSystem Instance { get; private set; }
@@ -13,9 +13,9 @@ public class SaveSystem : MonoBehaviour
 
     public BuildMode build;
     public CustomerSpawner spawner;
-    [Tooltip("Salva periodicamente, mesmo sem mudanças")]
+    [Tooltip("Saves periodically, even without changes")]
     public float autosaveInterval = 30f;
-    [Tooltip("Espera um pouquinho depois de uma mudança antes de salvar (junta várias mudanças)")]
+    [Tooltip("Waits a moment after a change before saving (batches several changes)")]
     public float debounce = 0.6f;
 
     [System.Serializable]
@@ -58,7 +58,7 @@ public class SaveSystem : MonoBehaviour
 
     void OnCoins(int total, int delta) => MarkDirty();
 
-    // Pede um salvamento em breve
+    // Requests a save soon
     public void MarkDirty()
     {
         if (loaded) saveAt = Time.unscaledTime + debounce;
@@ -76,7 +76,7 @@ public class SaveSystem : MonoBehaviour
     public void Save(bool showToast)
     {
         if (!loaded) return;
-        // no meio de mover uma decoração o item está escondido; salva depois
+        // while a decoration is being moved it is hidden; save later
         if (build != null && build.IsMovingSomething) { saveAt = Time.unscaledTime + 1f; return; }
         saveAt = -1f;
         nextAutosave = Time.unscaledTime + autosaveInterval;
@@ -90,7 +90,7 @@ public class SaveSystem : MonoBehaviour
         }
         foreach (var d in FindObjectsByType<Decoration>(FindObjectsInactive.Exclude, FindObjectsSortMode.InstanceID))
         {
-            if (!d.enabled) continue; // fantasma do Modo Construção
+            if (!d.enabled) continue; // Build Mode ghost
             Vector3 p = d.transform.position;
             data.decorations.Add(new DecorationSave { id = d.displayName, x = p.x, z = p.z, yaw = d.transform.eulerAngles.y, color = d.ColorName });
         }
@@ -102,18 +102,18 @@ public class SaveSystem : MonoBehaviour
         }
         catch (System.Exception e)
         {
-            Debug.LogWarning("[Save] Não foi possível salvar: " + e.Message);
+            Debug.LogWarning("[Save] Could not save: " + e.Message);
         }
     }
 
     void Load()
     {
         loaded = true;
-        if (!File.Exists(SavePath)) return; // primeira vez: fica a ilha padrão da cena
+        if (!File.Exists(SavePath)) return; // first run: keep the scene's default island
 
         SaveData data;
         try { data = JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath)); }
-        catch (System.Exception e) { Debug.LogWarning("[Save] Save inválido, começando do zero: " + e.Message); return; }
+        catch (System.Exception e) { Debug.LogWarning("[Save] Invalid save, starting fresh: " + e.Message); return; }
         if (data == null) return;
 
         CoinWallet.Set(data.coins);
@@ -124,7 +124,7 @@ public class SaveSystem : MonoBehaviour
             if (!data.musicOn) AudioManager.Instance.SetMusicOn(false);
         }
 
-        // tira as decorações atuais da cena e recria as do save
+        // remove the scene's decorations and recreate the saved ones
         foreach (var d in FindObjectsByType<Decoration>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
         {
             if (d.isSeat && spawner != null) spawner.seats.Remove(d.transform);
@@ -135,7 +135,7 @@ public class SaveSystem : MonoBehaviour
         foreach (var s in data.decorations)
         {
             var template = build.FindTemplate(s.id);
-            if (template == null) { Debug.LogWarning("[Save] Item desconhecido no save: " + s.id); continue; }
+            if (template == null) { Debug.LogWarning("[Save] Unknown item in save: " + s.id); continue; }
             var go = Instantiate(template.gameObject, new Vector3(s.x, 0f, s.z), Quaternion.Euler(0f, s.yaw, 0f), build.decorationsParent);
             go.name = template.displayName;
             go.SetActive(true);

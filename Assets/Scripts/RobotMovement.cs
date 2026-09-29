@@ -1,37 +1,37 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Controla o movimento zen do R0-B0: velocidade direta com aceleração suave (sem "patinar"),
-// sem atrito nas paredes (desliza em vez de travar) e rotação feita pela física.
+// Drives R0-B0's zen movement: direct velocity with smooth acceleration (no "ice skating"),
+// frictionless walls (slides instead of sticking) and physics-driven rotation.
 [RequireComponent(typeof(Rigidbody))]
 public class RobotMovement : MonoBehaviour
 {
-    [Header("Configurações de Vibe")]
-    [Tooltip("Velocidade máxima (lenta e relaxante)")]
+    [Header("Vibe settings")]
+    [Tooltip("Top speed (slow and relaxing)")]
     public float moveSpeed = 3.2f;
 
-    [Tooltip("Aceleração ao começar a andar (m/s²)")]
+    [Tooltip("Acceleration when starting to walk (m/s²)")]
     public float acceleration = 14f;
 
-    [Tooltip("Desaceleração ao soltar as teclas (m/s²)")]
+    [Tooltip("Deceleration when the keys are released (m/s²)")]
     public float deceleration = 18f;
 
-    [Tooltip("Velocidade de giro para a direção do movimento")]
+    [Tooltip("Turn speed toward the movement direction")]
     public float turnSpeed = 10f;
 
-    [Tooltip("Entrada simulada (para testes automáticos); usada quando nenhuma tecla está pressionada")]
+    [Tooltip("Simulated input (for automated tests); used when no key is pressed")]
     public Vector2 simulatedInput;
 
-    [Tooltip("Direção no mundo (para testes automáticos); ignora a câmera quando não é zero")]
+    [Tooltip("World-space direction (for automated tests); ignores the camera when non-zero")]
     public Vector3 simulatedWorldDirection;
 
-    [Tooltip("Travado enquanto o Ro está fazendo uma ação (ex.: tirando café)")]
+    [Tooltip("Locked while Ro performs an action (e.g. brewing coffee)")]
     public bool movementLocked;
 
     private Rigidbody rb;
     private Vector3 inputDirection;
-    // Enquanto uma tecla está segurada, a direção fica presa à visão de quando começou a andar;
-    // assim a câmera pode girar sem o Ro sair fazendo curva/espiral.
+    // While a key is held, the direction stays tied to the view from when walking started,
+    // so the camera can rotate without Ro curving or spiraling.
     private bool basisLocked;
     private Vector3 lockedForward, lockedRight;
 
@@ -43,7 +43,7 @@ public class RobotMovement : MonoBehaviour
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         rb.constraints = RigidbodyConstraints.FreezeRotation;
 
-        // Sem atrito: encostar numa mesa/parede faz o Ro deslizar ao longo dela em vez de grudar
+        // No friction: touching a table or wall makes Ro slide along it instead of sticking
         var slippery = new PhysicsMaterial("Ro_SemAtrito")
         {
             dynamicFriction = 0f,
@@ -57,7 +57,7 @@ public class RobotMovement : MonoBehaviour
 
     void Update()
     {
-        // Input System novo (o projeto não usa mais o Input Manager antigo)
+        // New Input System (the project no longer uses the legacy Input Manager)
         var kb = Keyboard.current;
         float horizontal = 0f, vertical = 0f;
         if (kb != null)
@@ -76,7 +76,7 @@ public class RobotMovement : MonoBehaviour
             return;
         }
 
-        // Movimento relativo à câmera (W = "para cima" na tela)
+        // Camera-relative movement (W = "up" on screen)
         bool hasInput = horizontal != 0f || vertical != 0f;
         if (!hasInput) basisLocked = false;
         else if (!basisLocked)
@@ -99,7 +99,7 @@ public class RobotMovement : MonoBehaviour
         flat = Vector3.MoveTowards(flat, desired, rate * dt);
         rb.linearVelocity = new Vector3(flat.x, v.y, flat.z);
 
-        // Vira suavemente para onde está indo
+        // Turn smoothly toward the heading
         if (inputDirection.sqrMagnitude > 0.01f)
         {
             Quaternion look = Quaternion.LookRotation(inputDirection, Vector3.up);
