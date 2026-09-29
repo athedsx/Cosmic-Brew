@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cosmic Brew · um café aconchegante no espaço</title>
+<meta name="description" content="Cosmic Brew: jogo cozy de gerenciamento em 3D. Prepare cafés intergalácticos no seu ritmo, sem cronômetro, e decore o seu quiosque flutuante no espaço.">
+<meta property="og:title" content="Cosmic Brew">
+<meta property="og:description" content="Um café aconchegante flutuando no espaço. Jogue grátis no PC.">
+<meta property="og:image" content="img/poster.jpg">
+<link rel="icon" href="img/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --night: #1d1533;
+    --deep: #2a1f47;
+    --card: #342757;
+    --lilac: #cbbdf2;
+    --cream: #fff7ee;
+    --gold: #ffd373;
+    --peach: #ffb89a;
+    --pink: #ff8fb1;
+    --mint: #8fe6c4;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: "Nunito", system-ui, sans-serif;
+    color: var(--cream);
+    background:
+      radial-gradient(1200px 600px at 80% -10%, #5b3b7a 0%, transparent 60%),
+      radial-gradient(900px 500px at 0% 30%, #3a2a66 0%, transparent 60%),
+      linear-gradient(180deg, #221a3d 0%, #1a1330 60%, #150f27 100%);
+    background-color: var(--night);
+    min-height: 100vh;
+    line-height: 1.55;
+  }
+  /* estrelinhas */
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .55;
+    background-image:
+      radial-gradient(1.5px 1.5px at 12% 18%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 72% 12%, #fff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 42% 62%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 88% 48%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 22% 82%, #fff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 62% 88%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 5% 50%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 95% 80%, #fff 50%, transparent 51%);
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; position: relative; }
+  header { display: flex; align-items: center; gap: 12px; padding: 22px 0; }
+  header img { width: 40px; height: 40px; }
+  header b { font-weight: 900; font-size: 20px; letter-spacing: .3px; }
+  header nav { margin-left: auto; display: flex; gap: 18px; }
+  header nav a { color: var(--lilac); text-decoration: none; font-weight: 700; }
+  header nav a:hover { color: var(--cream); }
+
+  .hero { text-align: center; padding: 28px 0 10px; }
+  .hero h1 {
+    font-size: clamp(44px, 8vw, 88px); line-height: 1; margin: 0;
+    font-weight: 900; color: var(--gold);
+    text-shadow: 0 6px 0 rgba(20, 10, 40, .55);
+  }
+  .hero p.tag { font-size: clamp(18px, 2.6vw, 24px); color: var(--lilac); margin: 14px 0 26px; }
+
+  .video {
+    border-radius: 22px; overflow: hidden; background: #000;
+    box-shadow: 0 30px 80px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.06);
+    aspect-ratio: 16 / 9;
+  }
+  .video video { width: 100%; height: 100%; display: block; }
+
+  .cta { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; align-items: center; margin: 30px 0 8px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 12px;
+    padding: 16px 28px; border-radius: 999px; text-decoration: none;
+    font-weight: 900; font-size: 20px; color: #2b1d3f;
+    background: linear-gradient(180deg, #ffe39a, var(--gold));
+    box-shadow: 0 6px 0 #c9953a, 0 14px 30px rgba(255, 211, 115, .25);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(3px); box-shadow: 0 3px 0 #c9953a; }
+  .btn svg { width: 24px; height: 24px; }
+  .meta { color: var(--lilac); font-size: 15px; text-align: center; }
+
+  section { padding: 56px 0 8px; }
+  h2 { font-size: 30px; font-weight: 900; margin: 0 0 18px; }
+  h2 span { color: var(--gold); }
+
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+  .feat { background: rgba(52, 39, 87, .72); border: 1px solid rgba(255,255,255,.06); border-radius: 18px; padding: 20px; }
+  .feat .ico { font-size: 30px; }
+  .feat h3 { margin: 8px 0 6px; font-size: 19px; }
+  .feat p { margin: 0; color: var(--lilac); font-size: 15.5px; }
+
+  .shots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .shots img { width: 100%; border-radius: 16px; display: block; box-shadow: 0 14px 40px rgba(0,0,0,.35); }
+
+  table { width: 100%; border-collapse: collapse; background: rgba(52, 39, 87, .72); border-radius: 16px; overflow: hidden; }
+  td { padding: 11px 18px; border-bottom: 1px solid rgba(255,255,255,.06); }
+  td:first-child { color: var(--lilac); }
+  kbd {
+    display: inline-block; min-width: 28px; text-align: center; padding: 2px 9px; border-radius: 8px;
+    background: var(--cream); color: #2b1d3f; font-family: inherit; font-weight: 900; font-size: 14px;
+    box-shadow: 0 3px 0 #b9a9d6;
+  }
+
+  .req { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .note { background: rgba(255, 143, 177, .12); border: 1px solid rgba(255, 143, 177, .3); border-radius: 16px; padding: 18px 20px; color: var(--cream); }
+  .note b { color: var(--pink); }
+  ul.clean { margin: 0; padding-left: 20px; color: var(--lilac); }
+
+  footer { text-align: center; color: #9d8fc4; padding: 60px 0 40px; font-size: 14px; }
+
+  @media (max-width: 640px) {
+    header nav { display: none; }
+    .shots { grid-template-columns: 1fr; }
+    td { padding: 10px 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="img/icon.png" alt="">
+    <b>Cosmic Brew</b>
+    <nav>
+      <a href="#sobre">Sobre</a>
+      <a href="#controles">Controles</a>
+      <a href="#baixar">Baixar</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <h1>Cosmic Brew</h1>
+    <p class="tag">Um café aconchegante flutuando no espaço ☕✨</p>
+    <div class="video">
+      <video src="CosmicBrew_Trailer.mp4" poster="img/poster.jpg" controls playsinline preload="metadata"></video>
+    </div>
+    <div class="cta" id="baixar">
+      <a class="btn" href="CosmicBrew-Setup-v1.0.0.exe" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+        Baixar grátis para Windows
+      </a>
+    </div>
+    <p class="meta">Versão 1.0.0 · instalador para Windows 10/11 (64 bits) · 40 MB</p>
+  </div>
+
+  <section id="sobre">
+    <h2>Sem pressa, <span>sem cronômetro</span></h2>
+    <p style="color:var(--lilac);font-size:18px;max-width:780px;margin-top:0">
+      Você é o <b style="color:var(--cream)">R0-B0</b>, um robô minerador aposentado e muito cansado, que abriu um quiosque de café numa rota de descanso do cosmos.
+      Viajantes chegam de navezinha, fazem o pedido num balão de pensamento, e o Ro prepara tudo no próprio ritmo, ao som de um rádio lo-fi.
+    </p>
+    <div class="features">
+      <div class="feat"><div class="ico">🚀</div><h3>Clientes do espaço</h3><p>Aliens, astronautas perdidos e robôs estacionam na borda da ilha para uma pausa.</p></div>
+      <div class="feat"><div class="ico">☕</div><h3>Receitas intergalácticas</h3><p>Café, poeira estelar e leite nebuloso. Errou? Joga fora e faz de novo, sem punição.</p></div>
+      <div class="feat"><div class="ico">🪴</div><h3>Decore do seu jeito</h3><p>Modo Construção em grid: compre, mova, gire e pinte decorações, o deck e o quiosque.</p></div>
+      <div class="feat"><div class="ico">📻</div><h3>Rádio lo-fi</h3><p>Três faixas originais e sons ASMR: a máquina de café, as xícaras, as naves passando.</p></div>
+      <div class="feat"><div class="ico">⭐</div><h3>Moedas Estelares</h3><p>Cada cliente satisfeito solta um "Ahhh…" e deixa gorjeta para você expandir o quiosque.</p></div>
+      <div class="feat"><div class="ico">🌍</div><h3>6 idiomas</h3><p>Português, English, Русский, 한국어, 中文 e 日本語. Salvamento automático.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Capturas de <span>tela</span></h2>
+    <div class="shots">
+      <img src="img/shot_12.jpg" alt="Clientes esperando os pedidos na ilha" loading="lazy">
+      <img src="img/shot_17.jpg" alt="O Ro preparando café nas estações" loading="lazy">
+      <img src="img/shot_22.jpg" alt="Cliente bebendo e deixando gorjeta" loading="lazy">
+      <img src="img/shot_31.jpg" alt="Modo Construção com catálogo e cores" loading="lazy">
+    </div>
+  </section>
+
+  <section id="controles">
+    <h2><span>Controles</span></h2>
+    <table>
+      <tr><td>Andar</td><td><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd></td></tr>
+      <tr><td>Preparar / servir / interagir</td><td><kbd>E</kbd> ou <kbd>Espaço</kbd></td></tr>
+      <tr><td>Modo Construção</td><td><kbd>B</kbd>, depois clique nos objetos</td></tr>
+      <tr><td>Girar / guardar item</td><td><kbd>R</kbd> / <kbd>X</kbd></td></tr>
+      <tr><td>Girar câmera / zoom</td><td><kbd>Z</kbd> <kbd>C</kbd> / rodinha do mouse</td></tr>
+      <tr><td>Música / pausa</td><td><kbd>M</kbd> / <kbd>Esc</kbd></td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Como <span>instalar</span></h2>
+    <div class="req">
+      <div class="feat">
+        <h3>Passo a passo</h3>
+        <ul class="clean">
+          <li>Baixe o instalador <b style="color:var(--cream)">CosmicBrew-Setup-v1.0.0.exe</b>.</li>
+          <li>Abra o arquivo e siga o assistente (não precisa de administrador).</li>
+          <li>Jogue pelo atalho na Área de Trabalho ou no Menu Iniciar. Para remover, use "Adicionar ou remover programas".</li>
+        </ul>
+      </div>
+      <div class="feat">
+        <h3>Requisitos</h3>
+        <ul class="clean">
+          <li>Windows 10 ou 11, 64 bits</li>
+          <li>Placa de vídeo com DirectX 11</li>
+          <li>200 MB livres</li>
+        </ul>
+      </div>
+      <div class="note">
+        <b>O Windows avisou "O Windows protegeu o computador"?</b><br>
+        Isso aparece em jogos independentes sem assinatura digital. Clique em <b>Mais informações</b> e depois em <b>Executar assim mesmo</b>.
+      </div>
+    </div>
+  </section>
+
+  <footer>Cosmic Brew · © 2026 NodeStl · feito com carinho, café e lo-fi</footer>
+</div>
+</body>
+</html>

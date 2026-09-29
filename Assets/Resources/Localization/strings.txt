@@ -1,0 +1,124 @@
+key	pt	en	ru	ko	zh	ja
+ui.coins	Moedas Estelares	Star Coins	Звёздные монеты	별 코인	星星币	スターコイン
+hint.play	WASD andar  ·  E interagir  ·  B construir  ·  M música  ·  Z/C girar câmera  ·  rodinha: zoom	WASD move  ·  E interact  ·  B build  ·  M music  ·  Z/C rotate camera  ·  wheel: zoom	WASD — ходить  ·  E — действие  ·  B — строить  ·  M — музыка  ·  Z/C — камера  ·  колесо — зум	WASD 이동  ·  E 상호작용  ·  B 건설  ·  M 음악  ·  Z/C 카메라 회전  ·  휠: 줌	WASD 移动  ·  E 互动  ·  B 建造  ·  M 音乐  ·  Z/C 旋转镜头  ·  滚轮：缩放	WASD 移動  ·  E アクション  ·  B 建築  ·  M 音楽  ·  Z/C カメラ回転  ·  ホイール：ズーム
+hint.build	Clique: selecionar  ·  B ou Esc sair  ·  Z/C girar câmera  ·  rodinha: zoom	Click: select  ·  B or Esc exit  ·  Z/C rotate camera  ·  wheel: zoom	Клик — выбрать  ·  B или Esc — выход  ·  Z/C — камера  ·  колесо — зум	클릭: 선택  ·  B 또는 Esc 나가기  ·  Z/C 카메라 회전  ·  휠: 줌	点击：选择  ·  B 或 Esc 退出  ·  Z/C 旋转镜头  ·  滚轮：缩放	クリック：選択  ·  B か Esc で終了  ·  Z/C カメラ回転  ·  ホイール：ズーム
+cup.empty	Mãos livres · vá até uma estação e aperte E	Hands free · walk to a station and press E	Руки свободны · подойди к станции и нажми E	빈손이에요 · 스테이션으로 가서 E를 누르세요	两手空空 · 走到工作台按 E	手ぶら · ステーションで E を押そう
+cup.label	Xícara:	Cup:	Чашка:	컵:	杯子：	カップ：
+toast.saved	Jogo salvo	Game saved	Игра сохранена	저장 완료	已保存	セーブしました
+toast.music_on	♪  Música ligada	♪  Music on	♪  Музыка включена	♪  음악 켜짐	♪  音乐已开启	♪  音楽オン
+toast.music_off	Música desligada	Music off	Музыка выключена	음악 꺼짐	音乐已关闭	音楽オフ
+toast.track	♪  {0}	♪  {0}	♪  {0}	♪  {0}	♪  {0}	♪  {0}
+ing.coffee	Café	Coffee	Кофе	커피	咖啡	コーヒー
+ing.stardust	Poeira Estelar	Stardust	Звёздная пыль	별가루	星尘	星くず
+ing.milk	Leite Nebuloso	Nebula Milk	Туманное молоко	네뷸라 밀크	星云牛奶	ネビュラミルク
+recipe.espresso	Espresso Cósmico	Cosmic Espresso	Космический эспрессо	코스믹 에스프레소	宇宙浓缩咖啡	コズミック・エスプレッソ
+recipe.stellar	Café Estelar	Stellar Coffee	Звёздный кофе	별빛 커피	星光咖啡	星のコーヒー
+recipe.double	Duplo Nebuloso	Nebula Double	Туманный двойной	네뷸라 더블	星云双份	ネビュラ・ダブル
+recipe.latte	Latte Lunar	Lunar Latte	Лунный латте	루나 라떼	月光拿铁	ルナ・ラテ
+recipe.cloud	Nuvem de Nebulosa	Nebula Cloud	Облако туманности	네뷸라 구름	星云之云	ネビュラ・クラウド
+recipe.galaxy	Galáxia Cremosa	Creamy Galaxy	Сливочная галактика	크리미 갤럭시	奶油银河	クリーミー・ギャラクシー
+station.coffee	Tirar um café	Brew coffee	Сварить кофе	커피 내리기	萃取咖啡	コーヒーを淹れる
+station.grinder	Moer poeira estelar	Grind stardust	Смолоть звёздную пыль	별가루 갈기	研磨星尘	星くずを挽く
+station.milk	Vaporizar leite nebuloso	Steam nebula milk	Взбить туманное молоко	네뷸라 밀크 스팀하기	蒸星云牛奶	ネビュラミルクをスチーム
+station.full	Xícara cheia · use a lixeira	Cup is full · use the bin	Чашка полная · вылей в мусорку	컵이 가득 찼어요 · 쓰레기통을 쓰세요	杯子满了 · 倒进垃圾桶吧	カップがいっぱい · ゴミ箱へ
+station.added	+ {0}	+ {0}	+ {0}	+ {0}	+ {0}	+ {0}
+trash.prompt	Jogar fora e recomeçar	Toss it and start over	Вылить и начать заново	버리고 다시 하기	倒掉重做	捨ててやり直す
+trash.popup	Tudo bem, recomeçando~	No worries, starting over~	Ничего, начнём заново~	괜찮아요, 다시 해요~	没关系，重新来~	だいじょうぶ、やり直そう〜
+radio.prompt	Trocar a fita	Change the tape	Сменить кассету	테이프 바꾸기	换磁带	テープを替える
+radio.popup	♪ {0}	♪ {0}	♪ {0}	♪ {0}	♪ {0}	♪ {0}
+customer.serve	Servir {0}	Serve {0}	Подать: {0}	{0} 서빙하기	端上{0}	{0}を出す
+customer.ahh	Ahhh… que delícia!	Ahhh… delicious!	Ааах… как вкусно!	아아… 맛있다!	啊～真好喝！	はぁ〜… おいしい！
+customer.wrong	Hmm… não é esse~	Hmm… that's not it~	Хмм… это не то~	음… 이게 아닌데~	嗯……不是这个~	うーん… これじゃないな〜
+customer.paid	+{0} Moedas Estelares	+{0} Star Coins	+{0} звёздных монет	+{0} 별 코인	+{0} 星星币	+{0} スターコイン
+build.default	Modo Construção   ·   clique num item do catálogo para comprar, ou num objeto da ilha para mexer nele   ·   faixas rosa = lugar dos clientes	Build Mode   ·   click a catalog item to buy it, or click something on the island to edit it   ·   pink strips = customer spots	Строительство   ·   нажми на предмет в каталоге, чтобы купить, или на объект острова, чтобы изменить   ·   розовые полосы — места гостей	건설 모드   ·   카탈로그 아이템을 클릭해 구매하거나, 섬의 물건을 클릭해 편집하세요   ·   분홍 줄 = 손님 자리	建造模式   ·   点击目录中的物品购买，或点击岛上的东西进行编辑   ·   粉色区域 = 客人位置	建築モード   ·   カタログのアイテムをクリックして買う、または島の物をクリックして編集   ·   ピンクの帯 = お客さんの場所
+build.moving	Movendo: {0}   ·   clique: colocar   ·   R: girar   ·   botão direito: cancelar	Moving: {0}   ·   click: place   ·   R: rotate   ·   right click: cancel	Перемещение: {0}   ·   клик — поставить   ·   R — повернуть   ·   ПКМ — отмена	이동 중: {0}   ·   클릭: 놓기   ·   R: 회전   ·   우클릭: 취소	移动中：{0}   ·   点击：放置   ·   R：旋转   ·   右键：取消	移動中：{0}   ·   クリック：置く   ·   R：回転   ·   右クリック：キャンセル
+build.placing	Colocando: {0} ({1})   ·   clique: colocar   ·   R: girar   ·   botão direito: parar	Placing: {0} ({1})   ·   click: place   ·   R: rotate   ·   right click: stop	Размещение: {0} ({1})   ·   клик — поставить   ·   R — повернуть   ·   ПКМ — стоп	배치 중: {0} ({1})   ·   클릭: 놓기   ·   R: 회전   ·   우클릭: 그만	放置中：{0}（{1}）   ·   点击：放置   ·   R：旋转   ·   右键：停止	配置中：{0}（{1}）   ·   クリック：置く   ·   R：回転   ·   右クリック：やめる
+build.hover	{0}   ·   clique para selecionar	{0}   ·   click to select	{0}   ·   нажми, чтобы выбрать	{0}   ·   클릭해서 선택	{0}   ·   点击选择	{0}   ·   クリックで選択
+build.need	Faltam {0} Moedas Estelares para {1}~	You need {0} more Star Coins for {1}~	Не хватает {0} звёздных монет на «{1}»~	{1}까지 별 코인 {0}개가 더 필요해요~	还差 {0} 星星币才能买{1}~	{1}にはスターコインがあと{0}枚必要〜
+build.occupied	Tem alguém esperando aí~ espere o cliente sair.	Someone's waiting there~ wait for them to leave.	Там кто-то ждёт~ подожди, пока гость уйдёт.	거기 손님이 기다리고 있어요~ 떠날 때까지 기다려 주세요.	有客人在等哦~ 等他离开吧。	お客さんが待ってるよ〜 帰るまで待ってね。
+build.catalog	Catálogo de Decorações	Decoration Catalog	Каталог декора	장식 카탈로그	装饰目录	飾りカタログ
+build.tab_deco	Decorações	Decorations	Декор	장식	装饰	飾り
+build.tab_colors	Cores  (Tab)	Colors  (Tab)	Цвета  (Tab)	색상  (Tab)	颜色  (Tab)	カラー  (Tab)
+build.colors_title	Cores da Ilha   ·   cada troca: {0} Moedas Estelares	Island Colors   ·   each change: {0} Star Coins	Цвета острова   ·   смена цвета: {0} звёздных монет	섬 색상   ·   변경마다 별 코인 {0}개	岛屿颜色   ·   每次更换：{0} 星星币	島のカラー   ·   変更ごとにスターコイン{0}枚
+build.color_cost	Trocar de cor custa {0} Moedas Estelares~	Changing color costs {0} Star Coins~	Смена цвета стоит {0} звёздных монет~	색 변경은 별 코인 {0}개예요~	换颜色需要 {0} 星星币~	色の変更はスターコイン{0}枚〜
+build.color_done	{0}: {1}  (-{2})	{0}: {1}  (-{2})	{0}: {1}  (-{2})	{0}: {1}  (-{2})	{0}：{1}  (-{2})	{0}：{1}  (-{2})
+build.stored	+{0} (guardado)	+{0} (stored)	+{0} (убрано)	+{0} (보관함)	+{0}（已收起）	+{0}（しまった）
+build.sel_current	Atual: {0}	Current: {0}	Сейчас: {0}	현재: {0}	当前：{0}	いま：{0}
+build.sel_color	Cor   ·   {0} moedas por troca	Color   ·   {0} coins per change	Цвет   ·   {0} монет за смену	색상   ·   변경마다 {0} 코인	颜色   ·   每次更换 {0} 币	カラー   ·   変更ごとに{0}コイン
+build.btn_store	Guardar +{0}	Store +{0}	Убрать +{0}	보관 +{0}	收起 +{0}	しまう +{0}
+build.btn_rotate	Girar	Rotate	Повернуть	회전	旋转	回転
+build.btn_move	Mover	Move	Двигать	이동	移动	移動
+build.selected_part	{0}   ·   escolha uma cor no painel   ·   botão direito: soltar	{0}   ·   pick a color in the panel   ·   right click: deselect	{0}   ·   выбери цвет на панели   ·   ПКМ — снять выбор	{0}   ·   패널에서 색을 고르세요   ·   우클릭: 선택 해제	{0}   ·   在面板中选择颜色   ·   右键：取消选择	{0}   ·   パネルで色を選んでね   ·   右クリック：選択解除
+build.selected	{0}   ·   clique de novo: mover   ·   R: girar   ·   X: guardar   ·   botão direito: soltar	{0}   ·   click it again: move   ·   R: rotate   ·   X: store   ·   right click: deselect	{0}   ·   нажми ещё раз — переместить   ·   R — повернуть   ·   X — убрать   ·   ПКМ — снять выбор	{0}   ·   다시 클릭: 이동   ·   R: 회전   ·   X: 보관   ·   우클릭: 선택 해제	{0}   ·   再次点击：移动   ·   R：旋转   ·   X：收起   ·   右键：取消选择	{0}   ·   もう一度クリック：移動   ·   R：回転   ·   X：しまう   ·   右クリック：選択解除
+deco.rug	Tapete Pastel	Pastel Rug	Пастельный коврик	파스텔 러그	粉彩地毯	パステルラグ
+deco.lantern	Lanterna Quente	Warm Lantern	Тёплый фонарь	따스한 랜턴	暖光灯笼	あったかランタン
+deco.plant	Planta Alienígena	Alien Plant	Инопланетное растение	외계 식물	外星植物	エイリアンプラント
+deco.stool	Banquinho	Stool	Табурет	의자	小凳子	スツール
+deco.planet	Planeta de Brinquedo	Toy Planet	Игрушечная планета	장난감 행성	玩具星球	おもちゃの惑星
+deco.statue	Estátua da Moeda	Coin Statue	Статуя монеты	코인 동상	星币雕像	コインの像
+deco.milk	Vaporizador de Leite	Milk Steamer	Паровик для молока	우유 스티머	牛奶蒸汽机	ミルクスチーマー
+build.station_tag	Estação · novas receitas!	Station · new recipes!	Станция · новые рецепты!	스테이션 · 새 레시피!	工作站 · 新配方！	ステーション · 新レシピ！
+toast.new_recipes	Novas receitas: clientes vão pedir leite nebuloso~	New recipes: customers will order nebula milk~	Новые рецепты: гости будут заказывать туманное молоко~	새 레시피: 손님들이 네뷸라 밀크를 주문할 거예요~	新配方：客人会点星云牛奶啦~	新レシピ：お客さんがネビュラミルクを頼むよ〜
+colors.deck	Deck	Deck	Палуба	데크	甲板	デッキ
+colors.rim	Borda do deck	Deck edge	Край палубы	데크 테두리	甲板边缘	デッキのふち
+colors.kiosk	Quiosque	Kiosk	Киоск	키오스크	小卖亭	キオスク
+color.peach	Pêssego	Peach	Персик	복숭아	桃色	ピーチ
+color.cream	Creme	Cream	Крем	크림	奶油	クリーム
+color.pink	Rosa	Pink	Розовый	분홍	粉色	ピンク
+color.mint	Menta	Mint	Мята	민트	薄荷	ミント
+color.lavender	Lavanda	Lavender	Лаванда	라벤더	薰衣草	ラベンダー
+color.sky	Céu	Sky	Небо	하늘	天蓝	空色
+color.gold	Dourado	Gold	Золото	금색	金色	ゴールド
+color.blue	Azul	Blue	Синий	파랑	蓝色	ブルー
+color.original	Original	Original	Оригинал	원래 색	原色	オリジナル
+color.rosy	Rosado	Rosy	Розоватый	연분홍	淡粉	ほんのりピンク
+music.1	Café na Nebulosa	Coffee in the Nebula	Кофе в туманности	성운 속 커피	星云里的咖啡	星雲でコーヒー
+music.2	Órbita Preguiçosa	Lazy Orbit	Ленивая орбита	느긋한 궤도	慵懒轨道	のんびり軌道
+music.3	Poeira de Estrelas	Stardust	Звёздная пыль	별가루	星尘	星くず
+menu.subtitle	Um cafezinho no meio do cosmos	A cozy coffee break in the cosmos	Уютный кофе посреди космоса	우주 한가운데서 커피 한 잔	在宇宙中来一杯咖啡	宇宙のまんなかでコーヒーを
+menu.continue	Continuar	Continue	Продолжить	이어하기	继续游戏	つづきから
+menu.new	Novo Jogo	New Game	Новая игра	새 게임	新游戏	はじめから
+menu.options	Opções	Options	Настройки	설정	设置	オプション
+menu.quit	Sair	Quit	Выход	종료	退出	終了
+menu.confirm_new	Começar um novo jogo? Seu progresso atual será apagado.	Start a new game? Your current progress will be erased.	Начать новую игру? Текущий прогресс будет удалён.	새 게임을 시작할까요? 현재 진행 상황이 삭제돼요.	开始新游戏？当前进度将被删除。	新しくはじめますか？今の進行状況は消えます。
+menu.yes	Sim	Yes	Да	네	是	はい
+menu.no	Não	No	Нет	아니요	否	いいえ
+menu.back	Voltar	Back	Назад	뒤로	返回	もどる
+pause.title	Pausado	Paused	Пауза	일시정지	已暂停	ポーズ中
+pause.resume	Continuar	Resume	Продолжить	계속하기	继续	再開
+pause.main_menu	Menu principal	Main menu	Главное меню	메인 메뉴	主菜单	メインメニュー
+opt.tab_audio	Áudio	Audio	Звук	오디오	音频	サウンド
+opt.tab_language	Idioma	Language	Язык	언어	语言	言語
+opt.tab_video	Vídeo	Video	Графика	비디오	画面	画面
+opt.tab_controls	Controles	Controls	Управление	조작	操作	操作
+opt.master	Geral	Master	Общая	전체	总音量	全体
+opt.music	Música	Music	Музыка	음악	音乐	音楽
+opt.sfx	Efeitos	Effects	Эффекты	효과음	音效	効果音
+opt.characters	Personagens	Characters	Персонажи	캐릭터	角色	キャラクター
+opt.ambience	Ambiente	Ambience	Окружение	환경음	环境音	環境音
+opt.fullscreen	Tela cheia	Fullscreen	Полный экран	전체 화면	全屏	フルスクリーン
+opt.resolution	Resolução	Resolution	Разрешение	해상도	分辨率	解像度
+opt.quality	Qualidade	Quality	Качество	품질	画质	画質
+opt.vsync	VSync	VSync	VSync	수직 동기화	垂直同步	垂直同期
+opt.on	Ligado	On	Вкл	켜짐	开	オン
+opt.off	Desligado	Off	Выкл	꺼짐	关	オフ
+opt.q_low	Baixa	Low	Низкое	낮음	低	低
+opt.q_med	Média	Medium	Среднее	중간	中	中
+opt.q_high	Alta	High	Высокое	높음	高	高
+ctl.move	Andar	Move	Ходить	이동	移动	移動
+ctl.interact	Interagir	Interact	Действие	상호작용	互动	アクション
+ctl.build	Modo Construção	Build Mode	Режим строительства	건설 모드	建造模式	建築モード
+ctl.rotate_cam	Girar câmera	Rotate camera	Повернуть камеру	카메라 회전	旋转镜头	カメラ回転
+ctl.zoom	Zoom	Zoom	Зум	줌	缩放	ズーム
+ctl.music	Música liga/desliga	Music on/off	Музыка вкл/выкл	음악 켜기/끄기	音乐开/关	音楽オン/オフ
+ctl.pause	Pausa	Pause	Пауза	일시정지	暂停	ポーズ
+ctl.rotate_item	Girar item (construção)	Rotate item (build)	Повернуть предмет (стройка)	아이템 회전 (건설)	旋转物品（建造）	アイテム回転（建築）
+ctl.store	Guardar item (construção)	Store item (build)	Убрать предмет (стройка)	아이템 보관 (건설)	收起物品（建造）	アイテムをしまう（建築）
+key.wheel	Rodinha do mouse	Mouse wheel	Колесо мыши	마우스 휠	鼠标滚轮	マウスホイール
+key.space	Espaço	Space	Пробел	스페이스	空格	スペース
+trailer.subtitle	um café aconchegante flutuando no espaço	a cozy café floating in space				
+trailer.cap_travelers	Viajantes do espaço param para uma pausa	Space travelers stop by for a break				
+trailer.cap_brew	Prepare cafés intergalácticos, sem pressa e sem cronômetro	Brew intergalactic coffee, no rush, no timers				
+trailer.cap_tips	Ahhh… e as gorjetas vêm em Moedas Estelares	Ahhh… and tips come in Star Coins				
+trailer.cap_build	Decore e pinte a sua ilha do seu jeito	Decorate and paint your island your way				
+trailer.tagline	Jogue agora no PC	Play now on PC				

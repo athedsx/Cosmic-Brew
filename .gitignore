@@ -1,0 +1,56 @@
+# ---- Unity ----
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+sysinfo.txt
+crashlytics-build.properties
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# IDEs
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# ---- Project ----
+# Trailer frames and video (the MP4 ships as a release asset)
+/Trailer/
+# Temporary editor captures
+/Assets/_shot_*
+/Assets/_shot_*.meta
+# Local tooling and internal development notes
+/GEMINI.md
+/cosmic_brew_gdd.md
+/Docs/progresso*.html
+/Docs/img/
+/.claude/
+/.mcp.json
+__pycache__/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
